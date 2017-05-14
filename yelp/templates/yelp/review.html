@@ -1,0 +1,55 @@
+{% load static %}
+
+<html>
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="{% static 'yelp/rev-style.css' %}" />
+    <link rel="stylesheet" type="text/css" href="{% static 'yelp/css/bootstrap.min.css' %}" />
+    <script src="{% static 'yelp/js/bootstrap.min.js' %}"></script>
+    <script>
+        function mentionClicked(mention_id) {
+            var x = document.getElementsByClassName("candidates");
+            var i;
+            for (i = 0; i < x.length; ++i) {
+                x[i].style.display = "none";
+            }
+            document.getElementById('m' + mention_id).style.display='block';
+        }
+    </script>
+    <title>Review</title>
+</head>
+<body>
+
+{% if username %}
+
+<div class="navbar">
+    <ul class="nav navbar-nav">
+        <li><a> {{ username }} </a></li>
+        <li class="active"><a href="/yelp/logout/">Log out</a></li>
+    </ul>
+</div>
+
+<div class="container">
+
+{{ reviewed_biz.name }} &nbsp;&nbsp;&nbsp;&nbsp;
+{{ reviewed_biz.city }}
+<div class="div-review-text">
+{{ highlighted_review |safe }}
+</div>
+
+<a href="{% url 'yelp:review' prev_rev_idx %}">Prev</a>
+<a href="{% url 'yelp:review' next_rev_idx %}">Next</a>
+
+<div class="candidates-main">
+    {{candidates_html |safe}}
+</div>
+
+
+{% else %}
+Not logged in.
+{% endif %}
+
+</div>
+
+</body>
+</html>
