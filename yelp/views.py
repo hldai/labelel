@@ -25,9 +25,9 @@ def show_review(request, rev_idx):
     context['reviewed_biz'] = rev_biz
     context['highlighted_review'] = reviewdisp.get_review_text_disp_html(review_info)
 
-    candidates_html = reviewdisp.get_candidates_disp_html(review_info, rev_biz)
+    # candidates_html = reviewdisp.get_candidates_disp_html(review_info, rev_biz)
     # candidates_html = None
-    context['candidates_html'] = candidates_html
+    # context['candidates_html'] = candidates_html
     context['mention_candidates'] = reviewdisp.get_candidates_of_mentions(mentions, rev_biz)
 
     context['next_rev_idx'] = rev_idx + 1
@@ -39,6 +39,18 @@ def label(request, rev_idx):
     print request.POST.keys()
     return HttpResponse('OK' + rev_idx)
     # return HttpResponseRedirect(reverse('yelp:results', args=(question.id,)))
+
+
+def search_candidates(request):
+    mention_id = request.POST['mention_id']
+    search_text = request.POST['search_text']
+    reviewed_city = request.POST['reviewed_biz_city']
+    candidates = reviewdisp.search_candidates_es(search_text, reviewed_city)
+    context = {
+        'mention_id': mention_id,
+        'candidates': candidates
+    }
+    return render(request, 'yelp/candidates.html', context)
 
 
 def test(request):

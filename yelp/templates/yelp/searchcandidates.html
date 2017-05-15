@@ -1,10 +1,21 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
 
-</body>
-</html>
+<div class="row">
+    <div class="col-md-6">
+        <div id="custom-search-input">
+            <div class="input-group col-md-12">
+                <input type="text" class="form-control input-md" placeholder="Search Business"
+                       id="input-{{mention.mention_id}}"/>
+                <span class="input-group-btn">
+                    <button class="btn btn-info btn-md" type="button"
+                            onclick="showSearchResult('{{mention.mention_id}}', '{{ reviewed_biz.city }}', '{{csrf_token}}')">
+                        <i class="glyphicon glyphicon-search"></i>
+                    </button>
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="search-results-{{mention.mention_id}}">
+
+</div>

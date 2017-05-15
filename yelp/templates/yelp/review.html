@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <link rel="stylesheet" type="text/css" href="{% static 'yelp/css/bootstrap.min.css' %}" />
     <link rel="stylesheet" type="text/css" href="{% static 'yelp/rev-style.css' %}" />
+    <script src="{% static 'yelp/js/jquery-3.2.1.min.js' %}"></script>
     <script src="{% static 'yelp/js/bootstrap.min.js' %}"></script>
     <script src="{% static 'yelp/js/review.js' %}"></script>
     <title>Review</title>
@@ -45,50 +46,57 @@ CITY: {{ reviewed_biz.city }} STATE: {{ reviewed_biz.state }} ADDRESS: {{ review
     </div>
 
 <div class="candidates-main">
-    {% for mention, candidates in mention_candidates %}
+{% for mention, candidates in mention_candidates %}
 
-        {% if forloop.counter == 1 %}
-        <div class="div-candidates" id="m{{ mention.mention_id }}" style="display:block">
-        {% else %}
-        <div class="div-candidates" id="m{{ mention.mention_id }}">
-        {% endif %}
+    {% if forloop.counter == 1 %}
+    <div class="div-candidates" id="m{{ mention.mention_id }}" style="display:block">
+    {% else %}
+    <div class="div-candidates" id="m{{ mention.mention_id }}">
+    {% endif %}
 
-            {{forloop.counter}}
+    Mention #{{forloop.counter}}
 
-        <div class="row div-main-label" id="div-main-label-{{ mention.mention_id }}">
-            <div class="col-sm-1">
-                <input type="radio" name="main-label-{{ mention.mention_id }}" value="link"> Link
-            </div>
-            <div class="col-sm-1">
-                <input type="radio" name="main-label-{{ mention.mention_id }}" value="nil"> NIL
-            </div>
-            <div class="col-sm-1">
-                <input type="radio" name="main-label-{{ mention.mention_id }}" value="nobiz" checked="checked"> Not Biz
-            </div>
+    <div class="row div-main-label" id="div-main-label-{{ mention.mention_id }}">
+        <div class="col-sm-1">
+            <label class="radio-inline" onclick="checkRadio('radio-{{ mention.mention_id }}-1')">
+              <input type="radio" name="main-label-{{ mention.mention_id }}" value="link"> Link
+            </label>
         </div>
-
-        {% for biz in candidates %}
-            {% include "yelp/bizdetail.html" %}
-        {% endfor %}
+        <div class="col-sm-1">
+            <label class="radio-inline">
+            <input type="radio" name="main-label-{{ mention.mention_id }}" value="nil"> NIL
+            </label>
         </div>
+        <div class="col-sm-2">
+            <label class="radio-inline">
+            <input type="radio" name="main-label-{{ mention.mention_id }}" value="nobiz" checked="checked"> Not Business
+            </label>
+        </div>
+        <div class="col-sm-2">
+            <label class="radio-inline">
+            <input type="radio" name="main-label-{{ mention.mention_id }}" value="notsure"> Not Sure
+            </label>
+        </div>
+    </div>
 
-    {% endfor %}
+
+    <ul class="nav nav-tabs">
+      <li class="active"><a data-toggle="tab" href="#gen-{{ mention.mention_id }}">Generated</a></li>
+      <li><a data-toggle="tab" href="#search-{{ mention.mention_id }}">Search</a></li>
+    </ul>
+
+    <div class="tab-content">
+        <div id="gen-{{ mention.mention_id }}" class="tab-pane fade in active">
+            {% include "yelp/candidates.html" with mention_id=mention.mention_id %}
+        </div>
+        <div id="search-{{ mention.mention_id }}" class="tab-pane fade">
+            {% include "yelp/searchcandidates.html" %}
+        </div>
+    </div>
+
+    </div>
+{% endfor %}
 </div>
-
-    <div class="row">
-        <div class="col-md-6">
-            <div id="custom-search-input">
-                <div class="input-group col-md-12">
-                    <input type="text" class="form-control input-lg" placeholder="Search Business" />
-                    <span class="input-group-btn">
-                        <button class="btn btn-info btn-lg" type="button">
-                            <i class="glyphicon glyphicon-search"></i>
-                        </button>
-                    </span>
-                </div>
-            </div>
-        </div>
-	</div>
 
 </form>
 

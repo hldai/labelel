@@ -111,7 +111,7 @@ def __filter_es_candidates(hits, mention):
     return candidates
 
 
-def __gen_candidates_es(es, mention, rev_biz_city):
+def __search_biz_es(es, query_str, rev_biz_city):
     qbody = {
         "query": {
             "bool": {
@@ -132,12 +132,24 @@ def __gen_candidates_es(es, mention, rev_biz_city):
         }
     }
 
-    qbody['query']['bool']['must']['match']['name']['query'] = mention.name_str
+    qbody['query']['bool']['must']['match']['name']['query'] = query_str
     qbody['query']['bool']['should']['match']['city'] = rev_biz_city
     res = es.search(index=index_name, body=qbody, size=30)
 
-    candidates = __filter_es_candidates(res['hits']['hits'], mention)
+    return res['hits']['hits']
 
+
+def __gen_candidates_es(es, mention, rev_biz_city):
+    es_search_result = __search_biz_es(es, mention.name_str, rev_biz_city)
+    candidates = __filter_es_candidates(es_search_result, mention)
+    return candidates
+
+
+def search_candidates_es(search_str, rev_biz_city):
+    es_search_result = __search_biz_es(es, search_str, rev_biz_city)
+    candidates = list()
+    for hit in es_search_result:
+        candidates.append(get_business(hit['_source']['business_id']))
     return candidates
 
 

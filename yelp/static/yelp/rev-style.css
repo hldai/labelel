@@ -28,7 +28,8 @@ body {
 }
 
 .div-biz-detail {
-    margin-right: 50px;
+    cursor: hand;
+    padding: 5px;
 }
 
 #custom-search-input{
