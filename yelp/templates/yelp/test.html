@@ -1,0 +1,29 @@
+<html>
+<head>
+<meta charset="utf-8" />
+<title>ajax test</title>
+<script type="text/javascript" src="http://code.jquery.com/jquery-latest.js"></script>
+<script type="text/javascript">
+    function ajClick(cn) {
+        //$name = $(this).attr('name');
+        //alert(cn);
+        divid = '#out' + cn;
+        $(divid).empty().load('/yelp/testaj/', { name : cn, csrfmiddlewaretoken: '{{ csrf_token }}' });
+    }
+</script>
+<style type="text/css"></style>
+</head>
+<body>
+<button id="btn-1" name="1" onclick="ajClick(1)">1</button>
+<button id="btn-2" name="2" onclick="ajClick(2)">2</button>
+<button id="btn-3" name="3" onclick="ajClick(3)">3</button>
+<form action="{% url 'yelp:testsub' %}" method="post">
+    {% csrf_token %}
+    <input type="radio" name="tradio" value="link"> Link
+<div id="out1">out1</div>
+<div id="out2">out2</div>
+<div id="out3">out3</div>
+    <input type="submit" value="Submit" />
+</form>
+</body>
+</html>

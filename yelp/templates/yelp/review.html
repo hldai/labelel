@@ -3,19 +3,10 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <link rel="stylesheet" type="text/css" href="{% static 'yelp/rev-style.css' %}" />
     <link rel="stylesheet" type="text/css" href="{% static 'yelp/css/bootstrap.min.css' %}" />
+    <link rel="stylesheet" type="text/css" href="{% static 'yelp/rev-style.css' %}" />
     <script src="{% static 'yelp/js/bootstrap.min.js' %}"></script>
-    <script>
-        function mentionClicked(mention_id) {
-            var x = document.getElementsByClassName("candidates");
-            var i;
-            for (i = 0; i < x.length; ++i) {
-                x[i].style.display = "none";
-            }
-            document.getElementById('m' + mention_id).style.display='block';
-        }
-    </script>
+    <script src="{% static 'yelp/js/review.js' %}"></script>
     <title>Review</title>
 </head>
 <body>
@@ -31,18 +22,75 @@
 
 <div class="container">
 
-{{ reviewed_biz.name }} &nbsp;&nbsp;&nbsp;&nbsp;
-{{ reviewed_biz.city }}
+Reviewed Business: {{ reviewed_biz.name }} <br/>
+CITY: {{ reviewed_biz.city }} STATE: {{ reviewed_biz.state }} ADDRESS: {{ reviewed_biz.address }} <br/>
+
+{% for cat in reviewed_biz.categories %}
+    {{ cat }};
+{% endfor %}
+
 <div class="div-review-text">
 {{ highlighted_review |safe }}
 </div>
 
-<a href="{% url 'yelp:review' prev_rev_idx %}">Prev</a>
-<a href="{% url 'yelp:review' next_rev_idx %}">Next</a>
+<form action="{% url 'yelp:label' next_rev_idx %}" method="post">
+    {% csrf_token %}
+
+    <div class="row">
+        <div class="pull-right">
+            <a href="{% url 'yelp:review' prev_rev_idx %}">Prev</a>
+            <a href="{% url 'yelp:review' next_rev_idx %}">Next</a>
+            <input type="submit" value="Submit" />
+        </div>
+    </div>
 
 <div class="candidates-main">
-    {{candidates_html |safe}}
+    {% for mention, candidates in mention_candidates %}
+
+        {% if forloop.counter == 1 %}
+        <div class="div-candidates" id="m{{ mention.mention_id }}" style="display:block">
+        {% else %}
+        <div class="div-candidates" id="m{{ mention.mention_id }}">
+        {% endif %}
+
+            {{forloop.counter}}
+
+        <div class="row div-main-label" id="div-main-label-{{ mention.mention_id }}">
+            <div class="col-sm-1">
+                <input type="radio" name="main-label-{{ mention.mention_id }}" value="link"> Link
+            </div>
+            <div class="col-sm-1">
+                <input type="radio" name="main-label-{{ mention.mention_id }}" value="nil"> NIL
+            </div>
+            <div class="col-sm-1">
+                <input type="radio" name="main-label-{{ mention.mention_id }}" value="nobiz" checked="checked"> Not Biz
+            </div>
+        </div>
+
+        {% for biz in candidates %}
+            {% include "yelp/bizdetail.html" %}
+        {% endfor %}
+        </div>
+
+    {% endfor %}
 </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div id="custom-search-input">
+                <div class="input-group col-md-12">
+                    <input type="text" class="form-control input-lg" placeholder="Search Business" />
+                    <span class="input-group-btn">
+                        <button class="btn btn-info btn-lg" type="button">
+                            <i class="glyphicon glyphicon-search"></i>
+                        </button>
+                    </span>
+                </div>
+            </div>
+        </div>
+	</div>
+
+</form>
 
 
 {% else %}

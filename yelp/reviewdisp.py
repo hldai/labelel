@@ -76,6 +76,11 @@ def get_business(business_id):
     return res['_source']
 
 
+def get_mentions_of_review(review_id):
+    return mentions.get(review_id, None)
+
+
+# TODO use highlight_mentions directly
 def get_review_text_disp_html(rev_info):
     rev_text = rev_info['text']
     rev_id = rev_info['review_id']
@@ -138,7 +143,7 @@ def __gen_candidates_es(es, mention, rev_biz_city):
 
 def __get_candidates_disp(mention, rev_city):
     es_candidates = __gen_candidates_es(es, mention, rev_city)
-    disp_html = '<div class="candidates" id="m%s">' % mention.mention_id
+    disp_html = '<div class="div-candidates" id="m%s">' % mention.mention_id
     for biz_id, score in es_candidates:
         biz_info = get_business(biz_id)
         disp_html += '%s %f<br>' % (biz_info['name'], score)
@@ -156,3 +161,17 @@ def get_candidates_disp_html(rev_info, rev_biz_info):
     for m in rev_mentions:
         all_candidates_disp += __get_candidates_disp(m, rev_biz_info['city'])
     return all_candidates_disp
+
+
+def get_candidates_of_mentions(mentions, rev_biz_info):
+    if not mentions:
+        return None
+
+    rev_city = rev_biz_info['city']
+    mention_candidates = list()
+    for m in mentions:
+        es_candidates = __gen_candidates_es(es, m, rev_city)
+        tup = (m, [get_business(c[0]) for c in es_candidates])
+        mention_candidates.append(tup)
+        # candidates_dict[m.mention_id] = [get_business(c[0]) for c in es_candidates]
+    return mention_candidates

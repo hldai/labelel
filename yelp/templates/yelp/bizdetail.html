@@ -1,0 +1,13 @@
+<div class="div-candidate-row">
+    <div class="div-biz-radio">
+        <input type="radio" name="link-label-{{ mid }}" value="{{ biz.business_id }}">
+    </div>
+    <div class="div-biz-detail">
+        {{ biz.name }} <br/>
+        CITY: {{ biz.city }} STATE: {{ biz.state }} ADDRESS: {{ biz.address }} <br/>
+        {% for cat in biz.categories %}
+            {{ cat }};
+        {% endfor %}
+
+    </div>
+</div>
