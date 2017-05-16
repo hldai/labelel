@@ -51,9 +51,9 @@ __load_mentions()
 def __highlight_mentions(rev_text, mentions):
     new_text = u''
     last_pos = 0
-    for m in mentions:
-        new_text += u'%s<span class="mention" onclick="mentionClicked(\'%s\')">%s</span>' % (
-            rev_text[last_pos:m.begpos], m.mention_id, rev_text[m.begpos:m.endpos])
+    for i, m in enumerate(mentions):
+        new_text += u'%s<span id="mention-span-%d" class="mention" onclick="mentionClicked(%d, \'%s\')">%s</span>' % (
+            rev_text[last_pos:m.begpos], i, i, m.mention_id, rev_text[m.begpos:m.endpos])
         last_pos = m.endpos
 
     if len(mentions) > 0:
@@ -111,78 +111,89 @@ def __filter_es_candidates(hits, mention):
     return candidates
 
 
-def __search_biz_es(es, query_str, rev_biz_city):
+def __search_biz_es(es, query_str):
     qbody = {
         "query": {
             "bool": {
-                "must": {
-                    "match": {
-                        "name": {
-                            "query": "Choderwood",
-                            "boost": 5
-                        }
-                    }
-                },
-                "should": {
-                    "match": {
-                        "city": "Phoenix"
-                    }
-                }
+                "should": [
+                    {"match": {"name": {"query": query_str, "boost": 5}}},
+                    {"match": {"city": query_str}},
+                    {"match": {"state": query_str}},
+                    {"match": {"address": query_str}}
+                ]
             }
         }
     }
 
-    qbody['query']['bool']['must']['match']['name']['query'] = query_str
-    qbody['query']['bool']['should']['match']['city'] = rev_biz_city
     res = es.search(index=index_name, body=qbody, size=30)
 
     return res['hits']['hits']
 
 
-def __gen_candidates_es(es, mention, rev_biz_city):
-    es_search_result = __search_biz_es(es, mention.name_str, rev_biz_city)
+def __match_biz_es(es, rev_biz_city, query_str0, query_str1):
+    if query_str1:
+        qbody_match_name = {
+            "bool": {
+                "should": [
+                    {"match": {"name": {"query": query_str0, "boost": 5}}},
+                    {"match": {"name": {"query": query_str1, "boost": 5}}}
+                ]
+            }
+        }
+    else:
+        qbody_match_name = {"match": {"name": {"query": query_str0, "boost": 5}}}
+
+    qbody_match_city = {"match": {"city": rev_biz_city}}
+
+    qbody = {
+        "query": {
+            "bool": {
+                "must": qbody_match_name,
+                "should": qbody_match_city
+            }
+        }
+    }
+
+    res = es.search(index=index_name, body=qbody, size=30)
+
+    return res['hits']['hits']
+
+
+def __gen_candidates_es(es, mention, rev_biz_city, rev_text):
+    query_str1 = None
+    if mention.endpos + 1 < len(rev_text) and rev_text[mention.endpos:mention.endpos + 2] == "'s":
+        query_str1 = mention.name_str + "'s"
+    es_search_result = __match_biz_es(es, rev_biz_city, mention.name_str, query_str1)
     candidates = __filter_es_candidates(es_search_result, mention)
+
     return candidates
 
 
-def search_candidates_es(search_str, rev_biz_city):
-    es_search_result = __search_biz_es(es, search_str, rev_biz_city)
+def search_candidates_es(search_str):
+    es_search_result = __search_biz_es(es, search_str)
     candidates = list()
     for hit in es_search_result:
         candidates.append(get_business(hit['_source']['business_id']))
     return candidates
 
 
-def __get_candidates_disp(mention, rev_city):
-    es_candidates = __gen_candidates_es(es, mention, rev_city)
+def __get_candidates_disp(candidates, mention):
     disp_html = '<div class="div-candidates" id="m%s">' % mention.mention_id
-    for biz_id, score in es_candidates:
+    for biz_id, score in candidates:
         biz_info = get_business(biz_id)
         disp_html += '%s %f<br>' % (biz_info['name'], score)
     disp_html += '</div>\n'
     return disp_html
 
 
-def get_candidates_disp_html(rev_info, rev_biz_info):
-    rev_id = rev_info['review_id']
-    rev_mentions = mentions.get(rev_id, None)
-    if not rev_mentions:
-        return ''
-
-    all_candidates_disp = ''
-    for m in rev_mentions:
-        all_candidates_disp += __get_candidates_disp(m, rev_biz_info['city'])
-    return all_candidates_disp
-
-
-def get_candidates_of_mentions(mentions, rev_biz_info):
+def get_candidates_of_mentions(mentions, review_info, rev_biz_info):
     if not mentions:
         return None
 
     rev_city = rev_biz_info['city']
     mention_candidates = list()
     for m in mentions:
-        es_candidates = __gen_candidates_es(es, m, rev_city)
+        es_candidates = __gen_candidates_es(es, m, rev_city, review_info['text'])
         tup = (m, [get_business(c[0]) for c in es_candidates])
         mention_candidates.append(tup)
         # candidates_dict[m.mention_id] = [get_business(c[0]) for c in es_candidates]

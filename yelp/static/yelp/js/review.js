@@ -1,3 +1,5 @@
+var cur_mention_idx = 0;
+
 function hideClass(className) {
     var x = document.getElementsByClassName(className);
     var i;
@@ -6,10 +8,11 @@ function hideClass(className) {
     }
 }
 
-function mentionClicked(mention_id) {
+function mentionClicked(mention_idx, mention_id) {
+    cur_mention_idx = mention_idx;
     hideClass("div-candidates");
     //hideClass("div-main-label");
-    document.getElementById('m' + mention_id).style.display='block';
+    document.getElementById('span-mention-' + mention_id).style.display='block';
 //    document.getElementById('div-main-label-' + mention_id).style.display='block';
 }
 
@@ -39,12 +42,36 @@ $(document).ready(function(){
         return false;
         }
     });
+
     $('.input-search-biz').on('keyup', function(e) {
         var keyCode = e.keyCode || e.which;
         if (keyCode === 13) {
             var btnid = "#btn-search-" + $(this).attr('id').substring(6);
             $(btnid).trigger('click');
             return false;
+        }
+    });
+
+    $(document).keyup(function(e) {
+        var keyCode = e.keyCode || e.which;
+
+        if (keyCode === 37) {
+            --cur_mention_idx;
+            span_id = "#mention-span-" + cur_mention_idx.toString();
+            if ($(span_id).length) {
+                $(span_id).trigger('click');
+            } else {
+                ++cur_mention_idx;
+            }
+        }
+        if (keyCode === 39) {
+            ++cur_mention_idx;
+            span_id = "#mention-span-" + cur_mention_idx.toString();
+            if ($(span_id).length) {
+                $(span_id).trigger('click');
+            } else {
+                --cur_mention_idx;
+            }
         }
     });
 });
