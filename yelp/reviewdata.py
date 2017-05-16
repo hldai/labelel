@@ -1,8 +1,11 @@
 import json
 import gzip
 
-from mention import Mention
+from django.shortcuts import get_object_or_404
+from models import LabelResult
 from elasticsearch import Elasticsearch
+
+from mention import Mention
 
 index_name = 'yelp'
 es_url = 'localhost:9200'
@@ -177,15 +180,6 @@ def search_candidates_es(search_str):
     return candidates
 
 
-def __get_candidates_disp(candidates, mention):
-    disp_html = '<div class="div-candidates" id="m%s">' % mention.mention_id
-    for biz_id, score in candidates:
-        biz_info = get_business(biz_id)
-        disp_html += '%s %f<br>' % (biz_info['name'], score)
-    disp_html += '</div>\n'
-    return disp_html
-
-
 def get_candidates_of_mentions(mentions, review_info, rev_biz_info):
     if not mentions:
         return None
@@ -198,3 +192,34 @@ def get_candidates_of_mentions(mentions, review_info, rev_biz_info):
         mention_candidates.append(tup)
         # candidates_dict[m.mention_id] = [get_business(c[0]) for c in es_candidates]
     return mention_candidates
+
+
+def update_label_result(username, post_data):
+    main_label_prefix = 'main-label-'
+    link_label_prefix = 'link-label-'
+    len_main_label = len(main_label_prefix)
+    len_link_label = len(link_label_prefix)
+
+    mention_labels_main = dict()
+    mention_labels_link = dict()
+    for k, v in post_data.iteritems():
+        if k.startswith('main-label'):
+            mention_labels_main[k[len_main_label:]] = v
+        elif k.startswith('link-label'):
+            mention_labels_link[k[len_link_label:]] = v
+
+    for mention_id, val in mention_labels_main.iteritems():
+        try:
+            lr = LabelResult.objects.get(mention_id=mention_id, username=username)
+            # TODO server error
+        except LabelResult.DoesNotExist:
+            curstate = 0
+            biz_id = ''
+            if val == 'nobiz':
+                curstate = 1
+            elif val == 'nil':
+                curstate = 2
+            elif val == 'link':
+                biz_id = mention_labels_link[mention_id]
+            lr = LabelResult(mention_id=mention_id, cur_state=curstate, biz_id=biz_id, username=username)
+            lr.save()
