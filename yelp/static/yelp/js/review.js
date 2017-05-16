@@ -25,12 +25,26 @@ function showSearchResult(mention_id, reviewed_biz_city, csrf_token) {
     $(divid).empty().load('/yelp/search/', postdata);
 }
 
-function checkRadio(btn_id) {
+function checkRadio(mention_id, btn_id) {
+    link_radio_id = 'radio-link-' + mention_id;
+    document.getElementById(link_radio_id).checked = true;
     document.getElementById(btn_id).checked = true;
 }
 
 $(document).ready(function(){
-//    $(".div-biz-detail").click(function(){
-//        $('input', this).prop("checked",true);
-//    });
+    $('#form-main').on('keyup keypress', function(e) {
+        var keyCode = e.keyCode || e.which;
+        if (keyCode === 13) {
+        e.preventDefault();
+        return false;
+        }
+    });
+    $('.input-search-biz').on('keyup', function(e) {
+        var keyCode = e.keyCode || e.which;
+        if (keyCode === 13) {
+            var btnid = "#btn-search-" + $(this).attr('id').substring(6);
+            $(btnid).trigger('click');
+            return false;
+        }
+    });
 });

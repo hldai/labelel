@@ -48,7 +48,8 @@ def search_candidates(request):
     candidates = reviewdisp.search_candidates_es(search_text, reviewed_city)
     context = {
         'mention_id': mention_id,
-        'candidates': candidates
+        'candidates': candidates,
+        "candidate_type": "search"
     }
     return render(request, 'yelp/candidates.html', context)
 

@@ -1,17 +1,25 @@
 {% for biz in candidates %}
 
 <div class="div-candidate-row">
-    <div class="div-biz-detail" onclick="checkRadio('radio-{{ mention_id }}-{{ forloop.counter }}')">
+    <div class="div-biz-detail"
+         onclick="checkRadio('{{mention_id}}', 'radio-{{candidate_type}}-{{mention_id}}-{{forloop.counter}}')">
         <div class="div-biz-radio">
-            <input type="radio" name="link-label-{{ mention_id }}" value="{{ biz.business_id }}"
-                   id="radio-{{ mention_id }}-{{ forloop.counter }}">
+            <input type="radio" class="radio-candidate" name="link-label-{{ mention_id }}" value="{{ biz.business_id }}"
+                   id="radio-{{candidate_type}}-{{ mention_id }}-{{ forloop.counter }}">
         </div>
 
-        {{ biz.name }} <br/>
-        CITY: {{ biz.city }} STATE: {{ biz.state }} ADDRESS: {{ biz.address }} <br/>
-        {% for cat in biz.categories %}
-            {{ cat }};
-        {% endfor %}
+
+        <span class="span-key">Name:</span> <span class="span-value">{{ biz.name }}</span> <br/>
+        <span class="span-key">CITY:</span> <span class="span-value">{{ biz.city }}</span> &nbsp;&nbsp;
+        <span class="span-key">STATE:</span> <span class="span-value">{{ biz.state }}</span> &nbsp;&nbsp;
+        <span class="span-key">ADDRESS:</span> <span class="span-value">{{ biz.address }}</span> <br/>
+
+        <span class="span-key">CATEGORIES:</span>
+        <span class="span-value">
+            {% for cat in biz.categories %}
+                {{ cat }};
+            {% endfor %}
+        </span>
 
     </div>
 </div>

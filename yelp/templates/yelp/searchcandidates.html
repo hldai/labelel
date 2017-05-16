@@ -3,10 +3,10 @@
     <div class="col-md-6">
         <div id="custom-search-input">
             <div class="input-group col-md-12">
-                <input type="text" class="form-control input-md" placeholder="Search Business"
+                <input type="text" class="form-control input-md input-search-biz" placeholder="Search Business"
                        id="input-{{mention.mention_id}}"/>
                 <span class="input-group-btn">
-                    <button class="btn btn-info btn-md" type="button"
+                    <button class="btn btn-info btn-md" type="button" id="btn-search-{{mention.mention_id}}"
                             onclick="showSearchResult('{{mention.mention_id}}', '{{ reviewed_biz.city }}', '{{csrf_token}}')">
                         <i class="glyphicon glyphicon-search"></i>
                     </button>
