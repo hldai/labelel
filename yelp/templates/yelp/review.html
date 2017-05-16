@@ -23,17 +23,7 @@
 
 <div class="container">
 
-<span class="span-key">Reviewed Business:</span> <span class="span-value">{{ reviewed_biz.name }}</span> <br/>
-<span class="span-key">CITY:</span> <span class="span-value">{{ reviewed_biz.city }}</span> &nbsp;&nbsp;
-<span class="span-key">STATE:</span> <span class="span-value">{{ reviewed_biz.state }}</span> &nbsp;&nbsp;
-<span class="span-key">ADDRESS:</span> <span class="span-value">{{ reviewed_biz.address }}</span> <br/>
-
-<span class="span-key">CATEGORIES:</span>
-<span class="span-value">
-    {% for cat in reviewed_biz.categories %}
-        {{ cat }};
-    {% endfor %}
-</span>
+    {% include "yelp/businessdetail.html" with biz=reviewed_biz %}
 
 <div class="div-review-text">
 {{ highlighted_review |safe }}
@@ -51,7 +41,7 @@
     </div>
 
 <div class="candidates-main">
-{% for mention, candidates in mention_candidates %}
+{% for mention, is_labeled, candidates in mention_candidates %}
 
     {% if forloop.counter == 1 %}
     <div class="div-candidates" id="span-mention-{{ mention.mention_id }}" style="display:block">
@@ -60,6 +50,10 @@
     {% endif %}
 
     Mention #{{forloop.counter}}
+
+    {% if is_labeled %}
+        {% include "yelp/labelresult.html" with labelresult=candidates %}
+    {% else %}
 
     <div class="row div-main-label" id="div-main-label-{{ mention.mention_id }}">
         <div class="col-sm-1">
@@ -98,6 +92,8 @@
             {% include "yelp/searchcandidates.html" %}
         </div>
     </div>
+
+    {% endif %}
 
     </div>
 {% endfor %}

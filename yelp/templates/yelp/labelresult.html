@@ -1,0 +1,15 @@
+<div class="div-label-result">
+{% if labelresult.cur_state == 1 %}
+    Not Business
+{% elif labelresult.cur_state == 2 %}
+    NIL
+{% elif labelresult.cur_state == 3 %}
+    {% include "yelp/businessdetail.html" with biz=labelresult.biz %}
+{% else %}
+    ERROR
+{% endif %}
+    <div>
+    <!--<button type="button" class="btn btn-warning">Delete</button>-->
+        <a href="{% url 'yelp:deletelabel' rev_idx mention.mention_id %}" class="btn btn-warning">Delete</a>
+    </div>
+</div>

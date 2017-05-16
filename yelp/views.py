@@ -23,13 +23,12 @@ def show_review(request, rev_idx):
 
     context['mentions'] = mentions
     context['reviewed_biz'] = rev_biz
+    label_results = reviewdata.get_label_results(mentions, request.user.username)
     context['highlighted_review'] = reviewdata.get_review_text_disp_html(review_info)
+    context['mention_candidates'] = reviewdata.get_candidates_of_mentions(mentions, review_info, rev_biz,
+                                                                          label_results)
 
-    # candidates_html = reviewdisp.get_candidates_disp_html(review_info, rev_biz)
-    # candidates_html = None
-    # context['candidates_html'] = candidates_html
-    context['mention_candidates'] = reviewdata.get_candidates_of_mentions(mentions, review_info, rev_biz)
-
+    context['rev_idx'] = rev_idx
     context['next_rev_idx'] = rev_idx + 1
     context['prev_rev_idx'] = 1 if rev_idx == 1 else rev_idx - 1
     return render(request, 'yelp/review.html', context)
@@ -38,6 +37,11 @@ def show_review(request, rev_idx):
 def label(request, rev_idx):
     reviewdata.update_label_result(request.user.username, request.POST)
     # return HttpResponse('OK' + rev_idx)
+    return HttpResponseRedirect(reverse('yelp:review', args=(rev_idx,)))
+
+
+def delete_label(request, rev_idx, mention_id):
+    reviewdata.delete_label_result(mention_id, request.user.username)
     return HttpResponseRedirect(reverse('yelp:review', args=(rev_idx,)))
 
 

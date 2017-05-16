@@ -1,0 +1,11 @@
+<span class="span-key">NAME:</span> <span class="span-value">{{ biz.name }}</span> <br/>
+<span class="span-key">CITY:</span> <span class="span-value">{{ biz.city }}</span> &nbsp;&nbsp;
+<span class="span-key">STATE:</span> <span class="span-value">{{ biz.state }}</span> &nbsp;&nbsp;
+<span class="span-key">ADDRESS:</span> <span class="span-value">{{ biz.address }}</span> <br/>
+
+<span class="span-key">CATEGORIES:</span>
+<span class="span-value">
+    {% for cat in biz.categories %}
+        {{ cat }};
+    {% endfor %}
+</span>

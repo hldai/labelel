@@ -83,6 +83,17 @@ def get_mentions_of_review(review_id):
     return mentions.get(review_id, None)
 
 
+def get_label_results(mentions, username):
+    label_result_dict = dict()
+    for m in mentions:
+        try:
+            lr = LabelResult.objects.get(mention_id=m.mention_id, username=username)
+            label_result_dict[m.mention_id] = lr
+        except LabelResult.DoesNotExist:
+            continue
+    return label_result_dict
+
+
 # TODO use highlight_mentions directly
 def get_review_text_disp_html(rev_info):
     rev_text = rev_info['text']
@@ -180,16 +191,25 @@ def search_candidates_es(search_str):
     return candidates
 
 
-def get_candidates_of_mentions(mentions, review_info, rev_biz_info):
+def get_candidates_of_mentions(mentions, review_info, rev_biz_info, label_results):
     if not mentions:
         return None
 
     rev_city = rev_biz_info['city']
     mention_candidates = list()
     for m in mentions:
-        es_candidates = __gen_candidates_es(es, m, rev_city, review_info['text'])
-        tup = (m, [get_business(c[0]) for c in es_candidates])
-        mention_candidates.append(tup)
+        lr = label_results.get(m.mention_id, None)
+        if lr:
+            lr_disp = dict()
+            lr_disp['cur_state'] = lr.cur_state
+            if lr.cur_state == 3:
+                lr_disp['biz'] = get_business(lr.biz_id)
+            tup = (m, True, lr_disp)
+            mention_candidates.append(tup)
+        else:
+            es_candidates = __gen_candidates_es(es, m, rev_city, review_info['text'])
+            tup = (m, False, [get_business(c[0]) for c in es_candidates])
+            mention_candidates.append(tup)
         # candidates_dict[m.mention_id] = [get_business(c[0]) for c in es_candidates]
     return mention_candidates
 
@@ -220,6 +240,17 @@ def update_label_result(username, post_data):
             elif val == 'nil':
                 curstate = 2
             elif val == 'link':
+                curstate = 3
                 biz_id = mention_labels_link[mention_id]
+
+            if curstate == 0:
+                continue
+
             lr = LabelResult(mention_id=mention_id, cur_state=curstate, biz_id=biz_id, username=username)
             lr.save()
+
+
+def delete_label_result(mention_id, username):
+    # lr = LabelResult.objects.get(mention_id=mention_id, username=username)
+    lr = get_object_or_404(LabelResult, mention_id=mention_id, username=username)
+    lr.delete()
