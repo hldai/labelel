@@ -12,3 +12,11 @@ class LabelResult(models.Model):
     def __str__(self):
         return '%s\t%s\t%s\t%s' % (self.mention_id, self.cur_state,
                                    self.biz_id, self.username)
+
+
+class UserReview(models.Model):
+    username = models.CharField(max_length=64)
+    review_id = models.CharField(max_length=64)
+
+    def __str__(self):
+        return '%s\t%s' % (self.username, self.review_id)

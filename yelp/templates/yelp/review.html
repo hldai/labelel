@@ -33,10 +33,10 @@
     {% csrf_token %}
 
     <div class="row">
-        <div class="pull-right">
-            <a href="{% url 'yelp:review' prev_rev_idx %}">Prev</a>
-            <a href="{% url 'yelp:review' next_rev_idx %}">Next</a>
-            <input type="submit" value="Submit" />
+        <div class="pull-right div-rev-control">
+            <a href="{% url 'yelp:review' prev_rev_idx %}" class="btn btn-default">Prev</a>
+            <a href="{% url 'yelp:review' next_rev_idx %}" class="btn btn-default">Next</a>
+            <input type="submit" value="Submit" class="btn btn-primary"/>
         </div>
     </div>
 

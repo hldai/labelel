@@ -24,6 +24,15 @@ body {
     display: none;
 }
 
+.div-label-result {
+    background-color: #eee;
+    padding: 5px;
+}
+
+.div-rev-control {
+    margin-right: 20px;
+}
+
 .candidates-tab {
     margin: 5px;
 }

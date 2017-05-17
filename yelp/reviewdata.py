@@ -1,22 +1,28 @@
 import json
 import gzip
+import os
 
 from django.shortcuts import get_object_or_404
 from models import LabelResult
 from elasticsearch import Elasticsearch
 
 from mention import Mention
+from yelpcandidategen import YelpCandidateGen
 
 index_name = 'yelp'
 es_url = 'localhost:9200'
+es = Elasticsearch([es_url])
 biz_doc_type = 'biz'
 rev_doc_type = 'review'
-es = Elasticsearch([es_url])
 rev_ids = list()
 mentions = dict()
 
-rev_id_file = 'e:/data/yelp/valid_reviews_random1m.txt'
-mentions_file = 'e:/data/yelp/random_rev_mentions.txt'
+data_dir = 'e:/data/yelp'
+rev_id_file = os.path.join(data_dir, 'valid_reviews_random100k.txt')
+mentions_file = os.path.join(data_dir, 'reviews_random100k_mentions.txt')
+biz_acronyms_file = os.path.join(data_dir, 'biz_acronyms.txt')
+
+ycg = YelpCandidateGen(es, biz_acronyms_file, index_name, biz_doc_type)
 
 
 def __load_rev_ids():
@@ -207,10 +213,10 @@ def get_candidates_of_mentions(mentions, review_info, rev_biz_info, label_result
             tup = (m, True, lr_disp)
             mention_candidates.append(tup)
         else:
-            es_candidates = __gen_candidates_es(es, m, rev_city, review_info['text'])
-            tup = (m, False, [get_business(c[0]) for c in es_candidates])
+            # es_candidates = __gen_candidates_es(es, m, rev_city, review_info['text'])
+            candidates = ycg.gen_candidates(m, rev_city, review_info['text'])
+            tup = (m, False, [get_business(c[0]) for c in candidates])
             mention_candidates.append(tup)
-        # candidates_dict[m.mention_id] = [get_business(c[0]) for c in es_candidates]
     return mention_candidates
 
 
