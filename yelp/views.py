@@ -24,7 +24,8 @@ def show_review(request, rev_idx):
     context['mentions'] = mentions
     context['reviewed_biz'] = rev_biz
     label_results = reviewdata.get_label_results(mentions, request.user.username)
-    context['highlighted_review'] = reviewdata.get_review_text_disp_html(review_info)
+    # context['highlighted_review'] = reviewdata.get_review_text_disp_html(review_info)
+    context['highlighted_review'] = reviewdata.highlight_mentions(review_info['text'], mentions, label_results)
     context['mention_candidates'] = reviewdata.get_candidates_of_mentions(mentions, review_info, rev_biz,
                                                                           label_results)
 

@@ -10,10 +10,13 @@ function hideClass(className) {
 
 function mentionClicked(mention_idx, mention_id) {
     cur_mention_idx = mention_idx;
-    hideClass("div-candidates");
+    $('.div-candidates').css({"display": "none"});
     //hideClass("div-main-label");
+    $('.span-mention').css({"background-color": "powderblue"});
+    $('.span-mention-labeled').css({"background-color": "green"});
+    span_id = "#mention-span-" + cur_mention_idx.toString();
+    $(span_id).css({"background-color": "yellow"});
     document.getElementById('span-mention-' + mention_id).style.display='block';
-//    document.getElementById('div-main-label-' + mention_id).style.display='block';
 }
 
 function showSearchResult(mention_id, reviewed_biz_city, csrf_token) {

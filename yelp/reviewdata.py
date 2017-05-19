@@ -18,8 +18,9 @@ rev_ids = list()
 mentions = dict()
 
 data_dir = 'e:/data/yelp'
+# data_dir = '/home/hldai/data/yelp'
 rev_id_file = os.path.join(data_dir, 'valid_reviews_random100k.txt')
-mentions_file = os.path.join(data_dir, 'reviews_random100k_mentions.txt')
+mentions_file = os.path.join(data_dir, 'reviews_random100k_mentions.txt.gz')
 biz_acronyms_file = os.path.join(data_dir, 'biz_acronyms.txt')
 
 ycg = YelpCandidateGen(es, biz_acronyms_file, index_name, biz_doc_type)
@@ -40,7 +41,7 @@ def __load_rev_ids():
 
 def __load_mentions():
     print 'loading %s ...' % mentions_file
-    f = open(mentions_file, 'r')
+    f = gzip.open(mentions_file, 'r')
     while True:
         m = Mention.fromfile(f)
         if not m:
@@ -57,17 +58,19 @@ __load_rev_ids()
 __load_mentions()
 
 
-def __highlight_mentions(rev_text, mentions):
+def highlight_mentions(rev_text, mentions, label_results):
     new_text = u''
     last_pos = 0
     for i, m in enumerate(mentions):
-        new_text += u'%s<span id="mention-span-%d" class="mention" onclick="mentionClicked(%d, \'%s\')">%s</span>' % (
-            rev_text[last_pos:m.begpos], i, i, m.mention_id, rev_text[m.begpos:m.endpos])
+        span_class = 'span-mention'
+        if m.mention_id in label_results:
+            span_class += ' span-mention-labeled'
+        span_attrs = 'id="mention-span-%d" class="%s" onclick="mentionClicked(%d, \'%s\')' % (
+            i, span_class, i, m.mention_id)
+        new_text += u'%s<span %s">%s</span>' % (rev_text[last_pos:m.begpos], span_attrs, rev_text[m.begpos:m.endpos])
         last_pos = m.endpos
 
-    if len(mentions) > 0:
-        # last_m = mentions[-1]
-        new_text += rev_text[last_pos:]
+    new_text += rev_text[last_pos:]
     return new_text.replace('\n', '<br/>')
 
 
@@ -98,19 +101,6 @@ def get_label_results(mentions, username):
         except LabelResult.DoesNotExist:
             continue
     return label_result_dict
-
-
-# TODO use highlight_mentions directly
-def get_review_text_disp_html(rev_info):
-    rev_text = rev_info['text']
-    rev_id = rev_info['review_id']
-
-    rev_mentions = mentions.get(rev_id, None)
-
-    if not rev_mentions:
-        return rev_text
-
-    return __highlight_mentions(rev_text, rev_mentions)
 
 
 def __all_words_in(s0, s1):

@@ -15,9 +15,17 @@ body {
     font-weight: bold;
 }
 
-.mention {
+.span-mention {
     background-color: powderblue;
     cursor: hand;
+}
+
+.span-mention-labeled {
+    background-color: green;
+}
+
+#mention-span-0 {
+    background-color: yellow;
 }
 
 .div-candidates {
