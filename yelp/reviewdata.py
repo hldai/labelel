@@ -1,4 +1,5 @@
 import json
+import socket
 import gzip
 import os
 
@@ -9,18 +10,24 @@ from elasticsearch import Elasticsearch
 from mention import Mention
 from yelpcandidategen import YelpCandidateGen
 
+# review dispatch
+REV_DISPATCH_HOST = 'localhost'
+REV_DISPATCH_PORT = 9731
+
+# elasticsearch
 index_name = 'yelp'
 es_url = 'localhost:9200'
 es = Elasticsearch([es_url])
 biz_doc_type = 'biz'
 rev_doc_type = 'review'
+
 rev_ids = list()
 mentions = dict()
 
 data_dir = 'e:/data/yelp'
 # data_dir = '/home/hldai/data/yelp'
 rev_id_file = os.path.join(data_dir, 'valid_reviews_random100k.txt')
-mentions_file = os.path.join(data_dir, 'reviews_random100k_mentions.txt.gz')
+mentions_file = os.path.join(data_dir, 'reviews_random100k_mentions.txt')
 biz_acronyms_file = os.path.join(data_dir, 'biz_acronyms.txt')
 
 ycg = YelpCandidateGen(es, biz_acronyms_file, index_name, biz_doc_type)
@@ -41,7 +48,7 @@ def __load_rev_ids():
 
 def __load_mentions():
     print 'loading %s ...' % mentions_file
-    f = gzip.open(mentions_file, 'r')
+    f = open(mentions_file, 'r')
     while True:
         m = Mention.fromfile(f)
         if not m:
@@ -81,6 +88,31 @@ def get_review(rev_idx):
     rev_id = rev_ids[rev_idx]
     res = es.get(index=index_name, doc_type=rev_doc_type, id=rev_id)
     return res['_source']
+
+
+def get_review_for_user(username, user_rev_idx):
+    if user_rev_idx < 1:
+        user_rev_idx = 1
+
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    data = json.dumps({'username': username, 'review_idx': user_rev_idx})
+
+    try:
+        # Connect to server and send data
+        sock.connect((REV_DISPATCH_HOST, REV_DISPATCH_PORT))
+        sock.sendall(data)
+
+        # Receive data from the server and shut down
+        received = sock.recv(1024)
+        print username, received
+        received = json.loads(received)
+    finally:
+        sock.close()
+
+    rev_idx = received['review_idx']
+    rev_id = received['review_id']
+    res = es.get(index=index_name, doc_type=rev_doc_type, id=rev_id)
+    return rev_idx, res['_source']
 
 
 def get_business(business_id):
@@ -164,7 +196,7 @@ def __match_biz_es(es, rev_biz_city, query_str0, query_str1):
         }
     }
 
-    res = es.search(index=index_name, body=qbody, size=30)
+    res = es.search(index=index_name, body=qbody, size=20)
 
     return res['hits']['hits']
 

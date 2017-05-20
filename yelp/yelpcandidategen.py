@@ -66,7 +66,7 @@ class YelpCandidateGen:
             biz_list = acronym_biz_dict.get(acronym, list())
             if not biz_list:
                 acronym_biz_dict[acronym] = biz_list
-            biz_list.append((biz_id, biz_city))
+            biz_list.append((biz_id, biz_city.decode('utf-8')))
         f.close()
         return acronym_biz_dict
 
