@@ -3,12 +3,20 @@ from time import time
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect
 from django.urls import reverse
+from django.contrib.auth import views as auth_views
 
 import reviewdata
 
 
 def index(request):
-    return HttpResponse("Hello. You're at the yelp index.")
+    if not request.user.is_authenticated():
+        return auth_views.login(request, template_name="login.html")
+
+    context = dict()
+    context['username'] = username = request.user.username
+    context['num_reviews'] = 2
+    context['num_mentions'] = reviewdata.get_user_num_labeled_mentions(username)
+    return render(request, 'yelp/userlabelstat.html', context)
 
 
 def show_review(request, username, user_rev_idx):

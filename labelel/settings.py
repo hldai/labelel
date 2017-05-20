@@ -120,4 +120,4 @@ USE_TZ = True
 
 STATIC_URL = '/yelpstatic/'
 
-LOGIN_REDIRECT_URL = '/yelp/review/1/'
+LOGIN_REDIRECT_URL = '/yelp/'

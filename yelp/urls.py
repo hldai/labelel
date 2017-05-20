@@ -6,6 +6,7 @@ from . import views
 app_name = "yelp"
 urlpatterns = [
     url(r'^$', views.index, name='index'),
+    url(r'^login/$', auth_views.login, {'template_name': 'login.html'}, name='login'),
     url(r'^logout/$', auth_views.logout, {'next_page': '/yelp/login/'}, name='logout'),
     url(r'^review/(?P<username>\w+)/(?P<user_rev_idx>[0-9]+)/$', views.show_review, name='review'),
     url(r'^search/$', views.search_candidates, name='search'),

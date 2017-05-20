@@ -21,11 +21,11 @@ body {
 }
 
 .span-mention-labeled {
-    background-color: green;
+    background-color: lightgreen;
 }
 
 #mention-span-0 {
-    background-color: yellow;
+    background-color: #FFFF55;
 }
 
 .div-candidates {

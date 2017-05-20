@@ -19,6 +19,5 @@ from django.contrib.auth import views as auth_views
 
 urlpatterns = [
     url(r'^yelp/admin/', admin.site.urls),
-    url(r'^yelp/login/$', auth_views.login, {'template_name': 'login.html'}, name='login'),
     url(r'^yelp/', include('yelp.urls'))
 ]

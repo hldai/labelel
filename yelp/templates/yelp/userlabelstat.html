@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>User Info</title>
+</head>
+<body>
+
+<div style="margin: 20px">
+    Logged in as:&nbsp; {{ username }} &nbsp;&nbsp; <a href="/yelp/logout/">Log out</a>
+    <br>
+    <hr>
+    <div>
+    Number of reviews: {{num_reviews}}
+    <br>
+    Number of mentions: {{num_mentions}}
+    </div>
+    <br>
+    <hr>
+<a href="{% url 'yelp:review' username 1 %}">To Label Page</a>
+
+</div>
+
+
+</body>
+</html>

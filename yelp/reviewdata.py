@@ -4,6 +4,7 @@ import gzip
 import os
 
 from django.shortcuts import get_object_or_404
+from django.contrib.auth.models import User
 from models import LabelResult
 from elasticsearch import Elasticsearch
 
@@ -21,29 +22,16 @@ es = Elasticsearch([es_url])
 biz_doc_type = 'biz'
 rev_doc_type = 'review'
 
-rev_ids = list()
+user_num_mentions = dict()
 mentions = dict()
 
 data_dir = 'e:/data/yelp'
 # data_dir = '/home/hldai/data/yelp'
-rev_id_file = os.path.join(data_dir, 'valid_reviews_random100k.txt')
+# rev_id_file = os.path.join(data_dir, 'valid_reviews_random100k.txt')
 mentions_file = os.path.join(data_dir, 'reviews_random100k_mentions.txt')
 biz_acronyms_file = os.path.join(data_dir, 'biz_acronyms.txt')
 
 ycg = YelpCandidateGen(es, biz_acronyms_file, index_name, biz_doc_type)
-
-
-def __load_rev_ids():
-    if rev_ids:
-        return
-
-    print 'loading %s ...' % rev_id_file
-    f = open(rev_id_file, 'r')
-    for line in f:
-        # print line
-        rev_ids.append(line.strip())
-    f.close()
-    print len(rev_ids), 'reviews.'
 
 
 def __load_mentions():
@@ -61,8 +49,18 @@ def __load_mentions():
     f.close()
 
 
-__load_rev_ids()
-__load_mentions()
+def __init():
+    __load_mentions()
+    users = User.objects.all()
+    for u in users:
+        user_num_mentions[u.username] = LabelResult.objects.filter(username=u.username).count()
+    # print user_num_mentions
+
+__init()
+
+
+def get_user_num_labeled_mentions(username):
+    return user_num_mentions.get(username, 0)
 
 
 def highlight_mentions(rev_text, mentions, label_results):
@@ -79,15 +77,6 @@ def highlight_mentions(rev_text, mentions, label_results):
 
     new_text += rev_text[last_pos:]
     return new_text.replace('\n', '<br/>')
-
-
-def get_review(rev_idx):
-    if rev_idx >= len(rev_ids) or rev_idx < 0:
-        return None
-
-    rev_id = rev_ids[rev_idx]
-    res = es.get(index=index_name, doc_type=rev_doc_type, id=rev_id)
-    return res['_source']
 
 
 def get_review_for_user(username, user_rev_idx):
@@ -277,8 +266,13 @@ def update_label_result(username, post_data):
             lr = LabelResult(mention_id=mention_id, cur_state=curstate, biz_id=biz_id, username=username)
             lr.save()
 
+            cnt = user_num_mentions.get(username, 0)
+            user_num_mentions[username] = cnt + 1
+
 
 def delete_label_result(mention_id, username):
     # lr = LabelResult.objects.get(mention_id=mention_id, username=username)
     lr = get_object_or_404(LabelResult, mention_id=mention_id, username=username)
     lr.delete()
+
+    user_num_mentions[username] -= 1

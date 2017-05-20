@@ -20,3 +20,11 @@ class UserReview(models.Model):
 
     def __str__(self):
         return '%s\t%s' % (self.username, self.review_id)
+
+
+# class UserLabelStat(models.Model):
+#     username = models.CharField(max_length=64)
+#     num_mentions_labeled = models.IntegerField(default=0)
+#
+#     def __str__(self):
+#         return '%s\t%s' % (self.username, self.num_mentions_labeled)

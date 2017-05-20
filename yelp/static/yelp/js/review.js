@@ -13,9 +13,9 @@ function mentionClicked(mention_idx, mention_id) {
     $('.div-candidates').css({"display": "none"});
     //hideClass("div-main-label");
     $('.span-mention').css({"background-color": "powderblue"});
-    $('.span-mention-labeled').css({"background-color": "green"});
+    $('.span-mention-labeled').css({"background-color": "lightgreen"});
     span_id = "#mention-span-" + cur_mention_idx.toString();
-    $(span_id).css({"background-color": "yellow"});
+    $(span_id).css({"background-color": "#FFFF55"});
     document.getElementById('span-mention-' + mention_id).style.display='block';
 }
 
@@ -35,6 +35,26 @@ function checkRadio(mention_id, btn_id) {
     link_radio_id = 'radio-link-' + mention_id;
     document.getElementById(link_radio_id).checked = true;
     document.getElementById(btn_id).checked = true;
+}
+
+function prevMention() {
+    --cur_mention_idx;
+    span_id = "#mention-span-" + cur_mention_idx.toString();
+    if ($(span_id).length) {
+        $(span_id).trigger('click');
+    } else {
+        ++cur_mention_idx;
+    }
+}
+
+function nextMention() {
+    ++cur_mention_idx;
+    span_id = "#mention-span-" + cur_mention_idx.toString();
+    if ($(span_id).length) {
+        $(span_id).trigger('click');
+    } else {
+        --cur_mention_idx;
+    }
 }
 
 $(document).ready(function(){
@@ -59,22 +79,10 @@ $(document).ready(function(){
         var keyCode = e.keyCode || e.which;
 
         if (keyCode === 37) {
-            --cur_mention_idx;
-            span_id = "#mention-span-" + cur_mention_idx.toString();
-            if ($(span_id).length) {
-                $(span_id).trigger('click');
-            } else {
-                ++cur_mention_idx;
-            }
+            prevMention();
         }
         if (keyCode === 39) {
-            ++cur_mention_idx;
-            span_id = "#mention-span-" + cur_mention_idx.toString();
-            if ($(span_id).length) {
-                $(span_id).trigger('click');
-            } else {
-                --cur_mention_idx;
-            }
+            nextMention();
         }
     });
 });

@@ -26,6 +26,14 @@
     <div class="row">
     <div class="div-review-info col-md-6">
 
+
+        <div class="row">
+            <div class="pull-right div-rev-control">
+                <a href="{% url 'yelp:review' username prev_rev_idx %}" class="btn btn-success">Prev Review</a>
+                <a href="{% url 'yelp:review' username next_rev_idx %}" class="btn btn-success">Next Review</a>
+            </div>
+        </div>
+
         {% include "yelp/businessdetail.html" with biz=reviewed_biz %}
 
         <div class="div-review-text">
@@ -40,8 +48,8 @@
 
         <div class="row">
             <div class="pull-right div-rev-control">
-                <a href="{% url 'yelp:review' username prev_rev_idx %}" class="btn btn-default">Prev</a>
-                <a href="{% url 'yelp:review' username next_rev_idx %}" class="btn btn-default">Next</a>
+                <a class="btn btn-default" onclick="prevMention()">Prev</a>
+                <a class="btn btn-default" onclick="nextMention()">Next</a>
                 <input type="submit" value="Submit" class="btn btn-primary"/>
             </div>
         </div>
