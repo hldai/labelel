@@ -63,6 +63,11 @@ def get_user_num_labeled_mentions(username):
     return user_num_mentions.get(username, 0)
 
 
+def get_user_num_reviews(username):
+    received = __query_review_dispatcher(username, -1)
+    return received['num_reviews']
+
+
 def highlight_mentions(rev_text, mentions, label_results):
     new_text = u''
     last_pos = 0
@@ -79,10 +84,7 @@ def highlight_mentions(rev_text, mentions, label_results):
     return new_text.replace('\n', '<br/>')
 
 
-def get_review_for_user(username, user_rev_idx):
-    if user_rev_idx < 1:
-        user_rev_idx = 1
-
+def __query_review_dispatcher(username, user_rev_idx):
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     data = json.dumps({'username': username, 'review_idx': user_rev_idx})
 
@@ -93,10 +95,33 @@ def get_review_for_user(username, user_rev_idx):
 
         # Receive data from the server and shut down
         received = sock.recv(1024)
-        print username, received
+        # print username, received
         received = json.loads(received)
     finally:
         sock.close()
+
+    return received
+
+
+def get_review_for_user(username, user_rev_idx):
+    if user_rev_idx < 1:
+        user_rev_idx = 1
+
+    # sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    # data = json.dumps({'username': username, 'review_idx': user_rev_idx})
+    #
+    # try:
+    #     # Connect to server and send data
+    #     sock.connect((REV_DISPATCH_HOST, REV_DISPATCH_PORT))
+    #     sock.sendall(data)
+    #
+    #     # Receive data from the server and shut down
+    #     received = sock.recv(1024)
+    #     print username, received
+    #     received = json.loads(received)
+    # finally:
+    #     sock.close()
+    received = __query_review_dispatcher(username, user_rev_idx)
 
     rev_idx = received['review_idx']
     rev_id = received['review_id']

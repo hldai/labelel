@@ -14,8 +14,10 @@ def index(request):
 
     context = dict()
     context['username'] = username = request.user.username
-    context['num_reviews'] = 2
+    num_reviews = reviewdata.get_user_num_reviews(username)
+    context['num_reviews'] = num_reviews
     context['num_mentions'] = reviewdata.get_user_num_labeled_mentions(username)
+    context['label_review_idx'] = 1 if num_reviews == 0 else num_reviews
     return render(request, 'yelp/userlabelstat.html', context)
 
 

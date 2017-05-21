@@ -16,8 +16,8 @@
 
 <div class="navbar">
     <ul class="nav navbar-nav">
-        <li><a> {{ username }} </a></li>
-        <li class="active"><a href="/yelp/logout/">Log out</a></li>
+        <li><a href="{% url 'yelp:index' %}"> {{ username }} </a></li>
+        <li class="active"><a href="{% url 'yelp:logout' %}">Log out</a></li>
     </ul>
 </div>
 

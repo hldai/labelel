@@ -5,14 +5,14 @@ class YelpCandidateGen:
         self.biz_doc_type = biz_doc_type
         self.acronym_biz_dict = YelpCandidateGen.__load_biz_acronyms(biz_acronyms_file)
 
-    # TODO T.I.
     def gen_candidates(self, mention, rev_biz_city, rev_text):
         candidates = self.gen_candidates_es(mention, rev_biz_city, rev_text)
-        if ' ' not in mention.name_str and mention.name_str.isupper():
-            candidates_acr = self.acronym_biz_dict.get(mention.name_str, None)
+        abbr = mention.name_str.replace('.', '')
+        if ' ' not in abbr and abbr.isupper():
+            candidates_acr = self.acronym_biz_dict.get(abbr, None)
             if candidates_acr:
                 for biz_id, biz_city in candidates_acr:
-                    if biz_city == rev_biz_city:
+                    if len(abbr) > 2 or biz_city == rev_biz_city:
                         candidates.append((biz_id, 1.0))
         return candidates
 
