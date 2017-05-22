@@ -24,7 +24,7 @@ def index(request):
 def show_review(request, username, user_rev_idx):
     beg_time = time()
     if not request.user.is_authenticated():
-        return HttpResponseRedirect(reverse('login'))
+        return HttpResponseRedirect(reverse('yelp:login'))
     if username != request.user.username:
         return HttpResponse('404')
 
