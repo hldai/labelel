@@ -7,7 +7,7 @@
                        id="input-{{mention.mention_id}}"/>
                 <span class="input-group-btn">
                     <button class="btn btn-info btn-md" type="button" id="btn-search-{{mention.mention_id}}"
-                            onclick="showSearchResult('{{mention.mention_id}}', '{{ reviewed_biz.city }}', '{{csrf_token}}')">
+                            onclick="showSearchResult('{{mention.mention_id}}', '{{ reviewed_biz.city }}', '{% url 'yelp:search' %}', '{{csrf_token}}')">
                         <i class="glyphicon glyphicon-search"></i>
                     </button>
                 </span>

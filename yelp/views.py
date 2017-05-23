@@ -76,19 +76,5 @@ def search_candidates(request):
     return render(request, 'yelp/candidates.html', context)
 
 
-def test(request):
-    return render(request, 'yelp/test.html')
-
-
-def test_aj(request):
-    print request.GET.keys()
-    print request.POST.keys()
-    curname = request.POST['name']
-    res_html = '<input type="radio" name="tradio" value="r%s"> R%s' % (curname, curname)
-    return HttpResponse(res_html)
-
-
-def test_sub(request):
-    print request.POST.keys()
-    print request.POST['tradio']
-    return HttpResponse('SUb')
+def logout(request):
+    return auth_views.logout(request, next_page=reverse('yelp:login'))

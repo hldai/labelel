@@ -7,7 +7,7 @@
 <body>
 
 <div style="margin: 20px">
-    Logged in as:&nbsp; {{ username }} &nbsp;&nbsp; <a href="/yelp/logout/">Log out</a>
+    Logged in as:&nbsp; {{ username }} &nbsp;&nbsp; <a href="{% url 'yelp:logout' %}">Log out</a>
     <br>
     <hr>
     <div>
