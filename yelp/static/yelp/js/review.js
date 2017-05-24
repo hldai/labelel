@@ -23,8 +23,10 @@ function showSearchResult(mention_id, reviewed_biz_city, search_url, csrf_token)
     postdata = {
         csrfmiddlewaretoken: csrf_token,
         mention_id: mention_id,
-        reviewed_biz_city: reviewed_biz_city,
-        search_text: document.getElementById('input-' + mention_id).value
+//        reviewed_biz_city: reviewed_biz_city,
+        query_name: document.getElementById('input-query-name-' + mention_id).value,
+        query_city: document.getElementById('input-query-city-' + mention_id).value,
+        query_addr: document.getElementById('input-query-addr-' + mention_id).value
     };
 
     divid = "#search-results-" + mention_id;
@@ -69,7 +71,7 @@ $(document).ready(function(){
     $('.input-search-biz').on('keyup', function(e) {
         var keyCode = e.keyCode || e.which;
         if (keyCode === 13) {
-            var btnid = "#btn-search-" + $(this).attr('id').substring(6);
+            var btnid = "#btn-search-" + $(this).attr('id').substring(17);
             $(btnid).trigger('click');
             return false;
         }

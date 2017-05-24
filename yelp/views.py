@@ -65,9 +65,11 @@ def delete_label(request, user_rev_idx, mention_id):
 
 def search_candidates(request):
     mention_id = request.POST['mention_id']
-    search_text = request.POST['search_text']
+    biz_name = request.POST['query_name']
+    biz_city = request.POST['query_city']
+    biz_addr = request.POST['query_addr']
     # reviewed_city = request.POST['reviewed_biz_city']
-    candidates = reviewdata.search_candidates_es(search_text)
+    candidates = reviewdata.search_candidates_es(biz_name, biz_city, biz_addr)
     context = {
         'mention_id': mention_id,
         'candidates': candidates,

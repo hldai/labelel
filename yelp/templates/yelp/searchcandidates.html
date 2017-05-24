@@ -1,19 +1,23 @@
 
 <div class="row">
-    <div class="col-md-6">
-        <div id="custom-search-input">
-            <div class="input-group col-md-12">
-                <input type="text" class="form-control input-md input-search-biz" placeholder="Search Business"
-                       id="input-{{mention.mention_id}}"/>
-                <span class="input-group-btn">
-                    <button class="btn btn-info btn-md" type="button" id="btn-search-{{mention.mention_id}}"
-                            onclick="showSearchResult('{{mention.mention_id}}', '{{ reviewed_biz.city }}', '{% url 'yelp:search' %}', '{{csrf_token}}')">
-                        <i class="glyphicon glyphicon-search"></i>
-                    </button>
-                </span>
-            </div>
-        </div>
+    <div class="col-md-4">
+        <input type="text" class="form-control input-md input-search-biz" placeholder="Business Name"
+               id="input-query-name-{{mention.mention_id}}"/>
     </div>
+    <div class="col-md-3" style="padding-left:0px;">
+        <input type="text" class="form-control input-md input-search-biz" placeholder="City"
+               id="input-query-city-{{mention.mention_id}}"/>
+    </div>
+    <div class="col-md-3" style="padding-left:0px;">
+        <input type="text" class="form-control input-md input-search-biz" placeholder="Address"
+               id="input-query-addr-{{mention.mention_id}}"/>
+    </div>
+                <!--<span class="input-group-btn">-->
+    <button class="btn btn-default" type="button" id="btn-search-{{mention.mention_id}}"
+            onclick="showSearchResult('{{mention.mention_id}}', '{{ reviewed_biz.city }}', '{% url 'yelp:search' %}', '{{csrf_token}}')">
+        <!--<i class="glyphicon glyphicon-search"></i>-->
+        Search
+    </button>
 </div>
 
 <div id="search-results-{{mention.mention_id}}">
