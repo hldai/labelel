@@ -16,7 +16,7 @@ function mentionClicked(mention_idx, mention_id) {
     $('.span-mention-labeled').css({"background-color": "lightgreen"});
     span_id = "#mention-span-" + cur_mention_idx.toString();
     $(span_id).css({"background-color": "#FFFF55"});
-    document.getElementById('span-mention-' + mention_id).style.display='block';
+    document.getElementById('div-mention-' + mention_id).style.display='block';
 }
 
 function showSearchResult(mention_id, reviewed_biz_city, search_url, csrf_token) {

@@ -2,9 +2,12 @@ import json
 import socket
 import gzip
 import os
+import time
 
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.models import User
+from django.db import transaction
+import django.db
 from models import LabelResult
 from elasticsearch import Elasticsearch
 
@@ -256,20 +259,8 @@ def get_candidates_of_mentions(mentions, review_info, rev_biz_info, label_result
     return mention_candidates
 
 
-def update_label_result(username, post_data):
-    main_label_prefix = 'main-label-'
-    link_label_prefix = 'link-label-'
-    len_main_label = len(main_label_prefix)
-    len_link_label = len(link_label_prefix)
-
-    mention_labels_main = dict()
-    mention_labels_link = dict()
-    for k, v in post_data.iteritems():
-        if k.startswith('main-label'):
-            mention_labels_main[k[len_main_label:]] = v
-        elif k.startswith('link-label'):
-            mention_labels_link[k[len_link_label:]] = v
-
+@transaction.atomic
+def __save_label_results(username, mention_labels_main, mention_labels_link):
     for mention_id, val in mention_labels_main.iteritems():
         try:
             lr = LabelResult.objects.get(mention_id=mention_id, username=username)
@@ -293,6 +284,29 @@ def update_label_result(username, post_data):
 
             cnt = user_num_mentions.get(username, 0)
             user_num_mentions[username] = cnt + 1
+
+
+def update_label_result(username, post_data):
+    main_label_prefix = 'main-label-'
+    link_label_prefix = 'link-label-'
+    len_main_label = len(main_label_prefix)
+    len_link_label = len(link_label_prefix)
+
+    mention_labels_main = dict()
+    mention_labels_link = dict()
+    for k, v in post_data.iteritems():
+        if k.startswith('main-label'):
+            mention_labels_main[k[len_main_label:]] = v
+        elif k.startswith('link-label'):
+            mention_labels_link[k[len_link_label:]] = v
+
+    while True:
+        try:
+            __save_label_results(username, mention_labels_main, mention_labels_link)
+            break
+        except django.db.OperationalError:
+            print 'Operational Error'
+            time.sleep(0.5)
 
 
 def delete_label_result(mention_id, username):

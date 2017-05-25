@@ -23,6 +23,7 @@ def index(request):
 
 def show_review(request, username, user_rev_idx):
     beg_time = time()
+
     if not request.user.is_authenticated():
         return HttpResponseRedirect(reverse('yelp:login'))
     if username != request.user.username:
@@ -48,13 +49,19 @@ def show_review(request, username, user_rev_idx):
     context['user_rev_idx'] = user_rev_idx
     context['next_rev_idx'] = user_rev_idx + 1
     context['prev_rev_idx'] = 1 if user_rev_idx == 1 else user_rev_idx - 1
-    print time() - beg_time
+
+    elp = time() - beg_time
+    # if elp > 1:
+    print elp, username, user_rev_idx
+
     return render(request, 'yelp/review.html', context)
 
 
 def label(request, user_rev_idx):
+    tbeg = time()
     reviewdata.update_label_result(request.user.username, request.POST)
     # return HttpResponse('OK' + rev_idx)
+    print time() - tbeg
     return HttpResponseRedirect(reverse('yelp:review', args=(request.user.username, user_rev_idx,)))
 
 

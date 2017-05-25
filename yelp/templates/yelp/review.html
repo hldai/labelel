@@ -58,9 +58,9 @@
         {% for mention, is_labeled, candidates in mention_candidates %}
 
             {% if forloop.counter == 1 %}
-            <div class="div-candidates" id="span-mention-{{ mention.mention_id }}" style="display:block">
+            <div class="div-candidates" id="div-mention-{{ mention.mention_id }}" style="display:block">
             {% else %}
-            <div class="div-candidates" id="span-mention-{{ mention.mention_id }}">
+            <div class="div-candidates" id="div-mention-{{ mention.mention_id }}">
             {% endif %}
 
                 Mention {{forloop.counter}} / {{num_mentions}}
