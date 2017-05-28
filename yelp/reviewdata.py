@@ -10,6 +10,7 @@ from django.db import transaction
 import django.db
 from models import LabelResult
 from elasticsearch import Elasticsearch
+from labelel.settings import DATABASES
 
 from mention import Mention
 from yelpcandidategen import YelpCandidateGen
@@ -55,6 +56,11 @@ def __load_mentions():
 
 def __init():
     __load_mentions()
+
+    l = os.path.getsize(DATABASES['default']['NAME'])
+    if l == 0:
+        return
+
     users = User.objects.all()
     for u in users:
         user_num_mentions[u.username] = LabelResult.objects.filter(username=u.username).count()
