@@ -1,8 +1,8 @@
 <div class="div-label-result">
 {% if labelresult.cur_state == 1 %}
-    Not Business
-{% elif labelresult.cur_state == 2 %}
     NIL
+{% elif labelresult.cur_state == 2 %}
+    Wrong Mention
 {% elif labelresult.cur_state == 3 %}
     {% include "yelp/businessdetail.html" with biz=labelresult.biz %}
 {% else %}

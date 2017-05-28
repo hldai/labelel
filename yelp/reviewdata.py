@@ -32,6 +32,7 @@ data_dir = 'e:/data/yelp'
 # data_dir = '/home/hldai/data/yelp'
 # rev_id_file = os.path.join(data_dir, 'valid_reviews_random100k.txt')
 mentions_file = os.path.join(data_dir, 'reviews_random400k_mentions.txt')
+# mentions_file = os.path.join(data_dir, 'reviews_random400k_mentions_1.txt')
 biz_acronyms_file = os.path.join(data_dir, 'biz_acronyms.txt')
 
 ycg = YelpCandidateGen(es, biz_acronyms_file, index_name, biz_doc_type)
