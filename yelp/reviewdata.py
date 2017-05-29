@@ -29,8 +29,8 @@ rev_doc_type = 'review'
 user_num_mentions = dict()
 mentions = dict()
 
-data_dir = 'e:/data/yelp'
-# data_dir = '/home/hldai/data/yelp'
+# data_dir = 'e:/data/yelp'
+data_dir = '/home/hldai/data/yelp'
 # rev_id_file = os.path.join(data_dir, 'valid_reviews_random100k.txt')
 mentions_file = os.path.join(data_dir, 'reviews_random400k_mentions.txt')
 # mentions_file = os.path.join(data_dir, 'reviews_random400k_mentions_1.txt')
@@ -57,7 +57,8 @@ def __load_mentions():
 def __init():
     __load_mentions()
 
-    l = os.path.getsize(DATABASES['default']['NAME'])
+    db_file = DATABASES['default']['NAME']
+    l = os.path.getsize(db_file) if os.path.isfile(db_file) else 0
     if l == 0:
         return
 
