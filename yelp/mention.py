@@ -8,10 +8,20 @@ class Mention:
         self.mtype = mtype
         self.name_str = name_str
 
+    def __str__(self):
+        return u'%s\t%s\t%d\t%d\t%s\t%s' % (self.mention_id, self.docid, self.begpos, self.endpos,
+                                            self.mtype, self.name_str)
+
     def tofile(self, f):
         f.write((u'%s\t%s\t%d\t%d\t%s\t%s\n' % (self.mention_id, self.docid,
                                                 self.begpos, self.endpos, self.mtype,
                                                 self.name_str)).encode('utf-8'))
+
+    @staticmethod
+    def from_dict(mention_dict):
+        return Mention(mention_id=mention_dict['mention_id'], docid=mention_dict['docid'],
+                       begpos=mention_dict['begpos'], endpos=mention_dict['endpos'],
+                       mtype=mention_dict['mtype'], name_str=mention_dict['name_str'])
 
     @staticmethod
     def fromfile(f):

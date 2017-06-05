@@ -71,39 +71,53 @@
 
                 <div class="row div-main-label" id="div-main-label-{{ mention.mention_id }}">
                     <div class="col-md-2">
-                        <label class="radio-inline" onclick="checkRadio('radio-{{ mention.mention_id }}-1')">
+                        <!--<label class="radio-inline" onclick="checkRadio('{{ mention.mention_id }}', 'radio-gen-{{ mention.mention_id }}-1')">-->
+                        <label class="radio-inline" onclick="linkChecked('{{ mention.mention_id }}')">
                           <input type="radio" id="radio-link-{{ mention.mention_id }}" name="main-label-{{ mention.mention_id }}" value="link"> Link
                         </label>
                     </div>
-                    <div class="col-md-5">
-                        <label class="radio-inline">
+                    <div class="col-md-5 div-radio-nolink">
+                        <label class="radio-inline" onclick="nolinkChecked('{{ mention.mention_id }}')">
                         <input type="radio" name="main-label-{{ mention.mention_id }}" value="nil"> Wrong Mention
                         </label>
                     </div>
-                    <div class="col-md-2">
-                        <label class="radio-inline">
+                    <div class="col-md-2 div-radio-nolink">
+                        <label class="radio-inline" onclick="nolinkChecked('{{ mention.mention_id }}')">
                         <input type="radio" name="main-label-{{ mention.mention_id }}" value="nobiz" checked="checked"> NIL
                         </label>
                     </div>
-                    <div class="col-md-3">
-                        <label class="radio-inline">
+                    <div class="col-md-3 div-radio-nolink div-radio-notsure">
+                        <label class="radio-inline" onclick="nolinkChecked('{{ mention.mention_id }}')">
                         <input type="radio" name="main-label-{{ mention.mention_id }}" value="notsure"> Not Sure
                         </label>
                     </div>
                 </div>
 
 
-                <ul class="nav nav-tabs">
-                  <li class="active"><a data-toggle="tab" href="#gen-{{ mention.mention_id }}">Generated</a></li>
-                  <li><a data-toggle="tab" href="#search-{{ mention.mention_id }}">Search</a></li>
-                </ul>
-
-                <div class="tab-content candidates-tab">
-                    <div id="gen-{{ mention.mention_id }}" class="tab-pane fade in active">
-                        {% include "yelp/candidates.html" with mention_id=mention.mention_id candidate_type="gen" %}
+                <div id="div-link-{{mention.mention_id}}" class="div-link">
+                    <div class="row">
+                    <div class="pull-right div-checkbox">
+                        <label class="checkbox-inline">
+                            <input type="checkbox" name="franchise-{{mention.mention_id}}" value="franchise"> Franchise
+                        </label>
+                        <label class="checkbox-inline">
+                            <input type="checkbox" name="wrongspan-{{mention.mention_id}}" value="wrongspan"> Wrong Span
+                        </label>
                     </div>
-                    <div id="search-{{ mention.mention_id }}" class="tab-pane fade">
-                        {% include "yelp/searchcandidates.html" %}
+                    </div>
+
+                    <ul class="nav nav-tabs">
+                      <li class="active"><a data-toggle="tab" href="#gen-{{ mention.mention_id }}">Generated</a></li>
+                      <li><a data-toggle="tab" href="#search-{{ mention.mention_id }}">Search</a></li>
+                    </ul>
+
+                    <div class="tab-content candidates-tab">
+                        <div id="gen-{{ mention.mention_id }}" class="tab-pane fade in active">
+                            {% include "yelp/candidates.html" with mention_id=mention.mention_id candidate_type="gen" %}
+                        </div>
+                        <div id="search-{{ mention.mention_id }}" class="tab-pane fade">
+                            {% include "yelp/searchcandidates.html" %}
+                        </div>
                     </div>
                 </div>
 

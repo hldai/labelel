@@ -37,6 +37,19 @@ function checkRadio(mention_id, btn_id) {
     link_radio_id = 'radio-link-' + mention_id;
     document.getElementById(link_radio_id).checked = true;
     document.getElementById(btn_id).checked = true;
+//    $('#div-link-' + mention_id).css({"opacity": "1"});
+}
+
+function linkChecked(mention_id) {
+    qstr = 'input[name=link-label-' + mention_id + ']:checked'
+    var checkedCandidate = $(qstr);
+    if (checkedCandidate.length == 0) {
+        checkRadio(mention_id, 'radio-gen-' + mention_id + '-1')
+    }
+}
+
+function nolinkChecked(mention_id) {
+//    $('#div-link-' + mention_id).css({"opacity": "0.9"});
 }
 
 function prevMention() {

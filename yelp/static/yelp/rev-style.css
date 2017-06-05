@@ -32,6 +32,10 @@ body {
     display: none;
 }
 
+.div-link {
+    margin-top: 5px;
+}
+
 .div-label-result {
     background-color: #eee;
     padding: 5px;
@@ -39,6 +43,14 @@ body {
 
 .div-rev-control {
     margin-right: 20px;
+}
+
+.div-checkbox {
+    margin-right: 20px;
+}
+
+.div-radio-nolink {
+    border-bottom: solid 1px #ccc;
 }
 
 .candidates-tab {

@@ -33,10 +33,9 @@ def show_review(request, username, user_rev_idx):
     context['username'] = request.user.username
 
     user_rev_idx = int(user_rev_idx)
-    # review_info = reviewdata.get_review(rev_idx)
-    user_rev_idx, review_info = reviewdata.get_review_for_user(username, user_rev_idx)
+    user_rev_idx, review_info, mentions = reviewdata.get_review_for_user(username, user_rev_idx)
+    print len(mentions)
     rev_biz = reviewdata.get_business(review_info['business_id'])
-    mentions = reviewdata.get_mentions_of_review(review_info['review_id'])
 
     context['mentions'] = mentions
     context['num_mentions'] = len(mentions)

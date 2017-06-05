@@ -18,6 +18,7 @@ from yelpcandidategen import YelpCandidateGen
 # review dispatch
 REV_DISPATCH_HOST = 'localhost'
 REV_DISPATCH_PORT = 9731
+DATA_END_STR = 'DHLDHLDHLEND'
 
 # elasticsearch
 index_name = 'yelp'
@@ -29,33 +30,17 @@ rev_doc_type = 'review'
 user_num_mentions = dict()
 mentions = dict()
 
-# data_dir = 'e:/data/yelp'
-data_dir = '/home/hldai/data/yelp'
+data_dir = 'e:/data/yelp'
+# data_dir = '/home/hldai/data/yelp'
 # rev_id_file = os.path.join(data_dir, 'valid_reviews_random100k.txt')
-mentions_file = os.path.join(data_dir, 'reviews_random400k_mentions.txt')
 # mentions_file = os.path.join(data_dir, 'reviews_random400k_mentions_1.txt')
 biz_acronyms_file = os.path.join(data_dir, 'biz_acronyms.txt')
 
 ycg = YelpCandidateGen(es, biz_acronyms_file, index_name, biz_doc_type)
 
 
-def __load_mentions():
-    print 'loading %s ...' % mentions_file
-    f = open(mentions_file, 'r')
-    while True:
-        m = Mention.fromfile(f)
-        if not m:
-            break
-
-        rev_mentions = mentions.get(m.docid, list())
-        if not rev_mentions:
-            mentions[m.docid] = rev_mentions
-        rev_mentions.append(m)
-    f.close()
-
-
 def __init():
-    __load_mentions()
+    # __load_mentions()
 
     db_file = DATABASES['default']['NAME']
     l = os.path.getsize(db_file) if os.path.isfile(db_file) else 0
@@ -104,10 +89,15 @@ def __query_review_dispatcher(username, user_rev_idx):
         sock.connect((REV_DISPATCH_HOST, REV_DISPATCH_PORT))
         sock.sendall(data)
 
+        received = ''
         # Receive data from the server and shut down
-        received = sock.recv(1024)
+        while True:
+            data = sock.recv(1024)
+            received += data
+            if received.endswith(DATA_END_STR):
+                break
         # print username, received
-        received = json.loads(received)
+        received = json.loads(received[:-len(DATA_END_STR)])
     finally:
         sock.close()
 
@@ -118,35 +108,21 @@ def get_review_for_user(username, user_rev_idx):
     if user_rev_idx < 1:
         user_rev_idx = 1
 
-    # sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    # data = json.dumps({'username': username, 'review_idx': user_rev_idx})
-    #
-    # try:
-    #     # Connect to server and send data
-    #     sock.connect((REV_DISPATCH_HOST, REV_DISPATCH_PORT))
-    #     sock.sendall(data)
-    #
-    #     # Receive data from the server and shut down
-    #     received = sock.recv(1024)
-    #     print username, received
-    #     received = json.loads(received)
-    # finally:
-    #     sock.close()
     received = __query_review_dispatcher(username, user_rev_idx)
 
     rev_idx = received['review_idx']
     rev_id = received['review_id']
     res = es.get(index=index_name, doc_type=rev_doc_type, id=rev_id)
-    return rev_idx, res['_source']
+
+    mention_dicts = received['mentions']
+    mentions = [Mention.from_dict(mdict) for mdict in mention_dicts]
+
+    return rev_idx, res['_source'], mentions
 
 
 def get_business(business_id):
     res = es.get(index=index_name, doc_type=biz_doc_type, id=business_id)
     return res['_source']
-
-
-def get_mentions_of_review(review_id):
-    return mentions.get(review_id, None)
 
 
 def get_label_results(mentions, username):
