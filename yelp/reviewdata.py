@@ -3,12 +3,14 @@ import socket
 import gzip
 import os
 import time
+import sqlite3
 
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.models import User
 from django.db import transaction
 import django.db
-from models import LabelResult
+from models import LabelResultV2 as LabelResult
+# from models import LabelResult
 from elasticsearch import Elasticsearch
 from labelel.settings import DATABASES
 
@@ -39,6 +41,20 @@ biz_acronyms_file = os.path.join(data_dir, 'biz_acronyms.txt')
 ycg = YelpCandidateGen(es, biz_acronyms_file, index_name, biz_doc_type)
 
 
+def __table_exists(table_name, db_file):
+    conn = sqlite3.connect(db_file)
+    sql = "SELECT name FROM sqlite_master WHERE type='table' AND name=?"
+    # print table_name
+    r = conn.execute(sql, (table_name,))
+
+    exist = False
+    for _ in r:
+        exist = True
+        break
+    conn.close()
+    return exist
+
+
 def __init():
     # __load_mentions()
 
@@ -47,6 +63,10 @@ def __init():
     if l == 0:
         return
 
+    if not __table_exists('auth_user', db_file) or not __table_exists(LabelResult.table_name, db_file):
+        return
+
+    print 'initing user num mentions ...'
     users = User.objects.all()
     for u in users:
         user_num_mentions[u.username] = LabelResult.objects.filter(username=u.username).count()
@@ -270,20 +290,30 @@ def __save_label_results(username, mention_labels_main, mention_labels_link):
             user_num_mentions[username] = cnt + 1
 
 
-def update_label_result(username, post_data):
+def __get_main_labels(post_data):
     main_label_prefix = 'main-label-'
-    link_label_prefix = 'link-label-'
     len_main_label = len(main_label_prefix)
+    mention_labels_main = dict()
+    for k, v in post_data.iteritems():
+        if k.startswith(main_label_prefix):
+            mention_labels_main[k[len_main_label:]] = v
+    return mention_labels_main
+
+
+def __get_link_labels(post_data):
+    link_label_prefix = 'link-label-'
     len_link_label = len(link_label_prefix)
 
-    mention_labels_main = dict()
     mention_labels_link = dict()
     for k, v in post_data.iteritems():
-        if k.startswith('main-label'):
-            mention_labels_main[k[len_main_label:]] = v
-        elif k.startswith('link-label'):
+        if k.startswith('link-label'):
             mention_labels_link[k[len_link_label:]] = v
+    return mention_labels_link
 
+
+def __update_label_result_v1(username, post_data):
+    mention_labels_main = __get_main_labels(post_data)
+    mention_labels_link = __get_link_labels(post_data)
     while True:
         try:
             __save_label_results(username, mention_labels_main, mention_labels_link)
@@ -291,6 +321,24 @@ def update_label_result(username, post_data):
         except django.db.OperationalError:
             print 'Operational Error'
             time.sleep(0.5)
+
+
+def __update_label_result_v2(username, post_data):
+    mention_labels_main = __get_main_labels(post_data)
+    mention_labels_link = __get_link_labels(post_data)
+    while True:
+        try:
+            __save_label_results(username, mention_labels_main, mention_labels_link)
+            break
+        except django.db.OperationalError:
+            print 'Operational Error'
+            time.sleep(0.5)
+
+
+def update_label_result(username, post_data):
+    # __update_label_result_v1(username, post_data)
+    # __update_label_result_v2(username, post_data)
+    LabelResult.update_label_result(username, post_data)
 
 
 def delete_label_result(mention_id, username):
