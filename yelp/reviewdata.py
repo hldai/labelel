@@ -340,7 +340,10 @@ def __update_label_result_v2(username, post_data):
 def update_label_result(username, post_data):
     # __update_label_result_v1(username, post_data)
     # __update_label_result_v2(username, post_data)
-    LabelResult.update_label_result(username, post_data)
+    suc_cnt = LabelResult.update_label_result(username, post_data)
+
+    cnt = user_num_mentions.get(username, 0)
+    user_num_mentions[username] = cnt + suc_cnt
 
 
 def delete_label_result(mention_id, username):
