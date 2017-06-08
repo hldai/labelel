@@ -48,9 +48,9 @@ class LabelResult(models.Model):
             except LabelResult.DoesNotExist:
                 curstate = 0
                 biz_id = ''
-                if val == 'nobiz':
+                if val == 'nil':
                     curstate = 1
-                elif val == 'nil':
+                elif val == 'wm':
                     curstate = 2
                 elif val == 'link':
                     curstate = 3
@@ -94,28 +94,38 @@ class LabelResultV2(models.Model):
 
     @staticmethod
     @transaction.atomic
-    def __save_label_results(username, mention_labels_main, mention_labels_link):
+    def __save_label_results(username, mention_labels_main, post_data):
         success_cnt = 0
         for mention_id, val in mention_labels_main.iteritems():
+            is_franchise = 0
+            is_wrong_span = 0
             try:
                 lr = LabelResultV2.objects.get(mention_id=mention_id, username=username)
                 # TODO server error
             except LabelResultV2.DoesNotExist:
                 curstate = 0
                 biz_id = ''
-                if val == 'nobiz':
+                if val == 'nil':
                     curstate = 1
-                elif val == 'nil':
+                elif val == 'wm':
                     curstate = 2
                 elif val == 'link':
                     curstate = 3
-                    biz_id = mention_labels_link[mention_id]
+                    link_key = 'link-label-' + mention_id
+                    biz_id = post_data.get(link_key, None)
+                    if not biz_id:
+                        continue
+
+                    val_franchise = post_data.get('franchise-' + mention_id, None)
+                    is_franchise = 1 if val_franchise else 0
+                    val_wrongspan = post_data.get('wrongspan-' + mention_id, None)
+                    is_wrongspan = 1 if val_wrongspan else 0
 
                 if curstate == 0:
                     continue
 
                 lr = LabelResultV2(mention_id=mention_id, cur_state=curstate, biz_id=biz_id, username=username,
-                                   is_franchise=1, is_wrong_span=1)
+                                   is_franchise=is_franchise, is_wrong_span=is_wrongspan)
                 lr.save()
 
                 success_cnt += 1
@@ -123,11 +133,12 @@ class LabelResultV2(models.Model):
 
     @staticmethod
     def update_label_result(username, post_data):
+        print post_data
         mention_labels_main = get_main_labels(post_data)
-        mention_labels_link = get_link_labels(post_data)
+        # mention_labels_link = get_link_labels(post_data)
         while True:
             try:
-                return LabelResultV2.__save_label_results(username, mention_labels_main, mention_labels_link)
+                return LabelResultV2.__save_label_results(username, mention_labels_main, post_data)
             except OperationalError:
                 print 'Operational Error'
                 time.sleep(0.5)

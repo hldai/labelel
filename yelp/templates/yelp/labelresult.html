@@ -4,6 +4,12 @@
 {% elif labelresult.cur_state == 2 %}
     Wrong Mention
 {% elif labelresult.cur_state == 3 %}
+    {% if labelresult.is_franchise %}
+    <i> Franchise </i> <br>
+    {% endif %}
+    {% if labelresult.is_wrong_span %}
+    <i> Wrong Span </i> <br>
+    {% endif %}
     {% include "yelp/businessdetail.html" with biz=labelresult.biz %}
 {% else %}
     ERROR

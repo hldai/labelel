@@ -253,6 +253,8 @@ def get_candidates_of_mentions(mentions, review_info, rev_biz_info, label_result
             lr_disp['cur_state'] = lr.cur_state
             if lr.cur_state == 3:
                 lr_disp['biz'] = get_business(lr.biz_id)
+            lr_disp['is_franchise'] = lr.is_franchise
+            lr_disp['is_wrong_span'] = lr.is_wrong_span
             tup = (m, True, lr_disp)
             mention_candidates.append(tup)
         else:
@@ -272,9 +274,9 @@ def __save_label_results(username, mention_labels_main, mention_labels_link):
         except LabelResult.DoesNotExist:
             curstate = 0
             biz_id = ''
-            if val == 'nobiz':
+            if val == 'nil':
                 curstate = 1
-            elif val == 'nil':
+            elif val == 'wm':
                 curstate = 2
             elif val == 'link':
                 curstate = 3

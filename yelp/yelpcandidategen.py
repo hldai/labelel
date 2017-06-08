@@ -3,7 +3,9 @@ class YelpCandidateGen:
         self.es = elasticsearch
         self.index_name = index_name
         self.biz_doc_type = biz_doc_type
-        self.acronym_biz_dict = YelpCandidateGen.__load_biz_acronyms(biz_acronyms_file)
+        self.acronym_biz_dict = dict()
+        if biz_acronyms_file:
+            self.acronym_biz_dict = YelpCandidateGen.__load_biz_acronyms(biz_acronyms_file)
 
     def gen_candidates(self, mention, rev_biz_city, rev_text):
         candidates = self.gen_candidates_es(mention, rev_biz_city, rev_text)
