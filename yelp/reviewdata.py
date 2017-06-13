@@ -253,7 +253,7 @@ def get_candidates_of_mentions(mentions, review_info, rev_biz_info, label_result
             lr_disp['cur_state'] = lr.cur_state
             if lr.cur_state == 3:
                 lr_disp['biz'] = get_business(lr.biz_id)
-            lr_disp['is_franchise'] = lr.is_franchise
+            # lr_disp['is_franchise'] = lr.is_franchise
             lr_disp['is_wrong_span'] = lr.is_wrong_span
             tup = (m, True, lr_disp)
             mention_candidates.append(tup)

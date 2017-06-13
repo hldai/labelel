@@ -51,6 +51,27 @@ body {
 
 .div-radio-nolink {
     border-bottom: solid 1px #ccc;
+    padding: 0px;
+}
+
+#div-radio-fran {
+    width: 20%;
+}
+
+#div-radio-link {
+    width: 18%;
+}
+
+#div-radio-nil {
+    width: 11%;
+}
+
+#div-radio-wm {
+    width: 27%;
+}
+
+#div-radio-notsure {
+    width: 20%;
 }
 
 .candidates-tab {

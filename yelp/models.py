@@ -82,14 +82,14 @@ class LabelResultV2(models.Model):
 
     mention_id = models.CharField(max_length=64)
     cur_state = models.IntegerField(default=0)
-    is_franchise = models.SmallIntegerField(default=0)
+    # is_franchise = models.SmallIntegerField(default=0)
     is_wrong_span = models.SmallIntegerField(default=0)
     biz_id = models.CharField(max_length=64)
     username = models.CharField(max_length=64)
 
     def __str__(self):
-        return '%s\t%s\t%s\t%s\t%s\t%s' % (
-            self.mention_id, self.cur_state, self.is_franchise, self.is_wrong_span,
+        return '%s\t%s\t%s\t%s\t%s' % (
+            self.mention_id, self.cur_state, self.is_wrong_span,
             self.biz_id, self.username)
 
     @staticmethod
@@ -97,7 +97,7 @@ class LabelResultV2(models.Model):
     def __save_label_results(username, mention_labels_main, post_data):
         success_cnt = 0
         for mention_id, val in mention_labels_main.iteritems():
-            is_franchise = 0
+            # is_franchise = 0
             is_wrong_span = 0
             try:
                 lr = LabelResultV2.objects.get(mention_id=mention_id, username=username)
@@ -109,6 +109,8 @@ class LabelResultV2(models.Model):
                     curstate = 1
                 elif val == 'wm':
                     curstate = 2
+                elif val == 'fran':
+                    curstate = 4
                 elif val == 'link':
                     curstate = 3
                     link_key = 'link-label-' + mention_id
@@ -116,16 +118,18 @@ class LabelResultV2(models.Model):
                     if not biz_id:
                         continue
 
-                    val_franchise = post_data.get('franchise-' + mention_id, None)
-                    is_franchise = 1 if val_franchise else 0
+                    # val_franchise = post_data.get('franchise-' + mention_id, None)
+                    # is_franchise = 1 if val_franchise else 0
                     val_wrongspan = post_data.get('wrongspan-' + mention_id, None)
-                    is_wrongspan = 1 if val_wrongspan else 0
+                    is_wrong_span = 1 if val_wrongspan else 0
 
                 if curstate == 0:
                     continue
 
+                # lr = LabelResultV2(mention_id=mention_id, cur_state=curstate, biz_id=biz_id, username=username,
+                #                    is_franchise=is_franchise, is_wrong_span=is_wrong_span)
                 lr = LabelResultV2(mention_id=mention_id, cur_state=curstate, biz_id=biz_id, username=username,
-                                   is_franchise=is_franchise, is_wrong_span=is_wrongspan)
+                                   is_wrong_span=is_wrong_span)
                 lr.save()
 
                 success_cnt += 1
@@ -142,12 +146,3 @@ class LabelResultV2(models.Model):
             except OperationalError:
                 print 'Operational Error'
                 time.sleep(0.5)
-
-
-# class UserReview(models.Model):
-#     table_name = 'userreview'
-#     username = models.CharField(max_length=64)
-#     review_id = models.CharField(max_length=64)
-#
-#     def __str__(self):
-#         return '%s\t%s' % (self.username, self.review_id)

@@ -9,14 +9,21 @@ function hideClass(className) {
 }
 
 function mentionClicked(mention_idx, mention_id) {
+//    alert(cur_mention_idx);
     cur_mention_idx = mention_idx;
+    if (cur_mention_idx + 1 == $('.span-mention').length) {
+        $('#btn-submit').css({'background-color': '#337ab7', 'color': '#fff'});
+    }
+
     $('.div-candidates').css({"display": "none"});
     //hideClass("div-main-label");
     $('.span-mention').css({"background-color": "powderblue"});
     $('.span-mention-labeled').css({"background-color": "lightgreen"});
     span_id = "#mention-span-" + cur_mention_idx.toString();
+//    alert(span_id);
     $(span_id).css({"background-color": "#FFFF55"});
-    document.getElementById('div-mention-' + mention_id).style.display='block';
+    $('#div-mention-' + (cur_mention_idx + 1)).css({"display": "block"});
+//    document.getElementById('div-mention-' + mention_idx).style.display='block';
 }
 
 function showSearchResult(mention_id, reviewed_biz_city, search_url, csrf_token) {
@@ -73,6 +80,12 @@ function nextMention() {
 }
 
 $(document).ready(function(){
+    if ($('.span-mention').length == 1) {
+        $('#btn-submit').css({'background-color': '#337ab7', 'color': '#fff'});
+    }
+
+    $('#div-mention-1').css({"display": "block"});
+
     $('#form-main').on('keyup keypress', function(e) {
         var keyCode = e.keyCode || e.which;
         if (keyCode === 13) {
