@@ -74,6 +74,10 @@ body {
     width: 20%;
 }
 
+.div-search-row {
+    margin-bottom: 5px;
+}
+
 .candidates-tab {
     margin: 5px;
 }
