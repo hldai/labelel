@@ -111,6 +111,8 @@ class LabelResultV2(models.Model):
                     curstate = 2
                 elif val == 'fran':
                     curstate = 4
+                elif val == 'unlinkable':
+                    curstate = 5
                 elif val == 'link':
                     curstate = 3
                     link_key = 'link-label-' + mention_id
@@ -137,7 +139,7 @@ class LabelResultV2(models.Model):
 
     @staticmethod
     def update_label_result(username, post_data):
-        print post_data
+        # print post_data
         mention_labels_main = get_main_labels(post_data)
         # mention_labels_link = get_link_labels(post_data)
         while True:

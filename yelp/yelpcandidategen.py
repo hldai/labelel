@@ -8,6 +8,7 @@ class YelpCandidateGen:
             self.acronym_biz_dict = YelpCandidateGen.__load_biz_acronyms(biz_acronyms_file)
 
     def gen_candidates(self, mention, rev_biz_city, rev_text):
+        # print mention.name_str, rev_biz_city
         candidates = self.gen_candidates_es(mention, rev_biz_city, rev_text)
         abbr = mention.name_str.replace('.', '')
         if ' ' not in abbr and abbr.isupper():
@@ -23,7 +24,9 @@ class YelpCandidateGen:
         if mention.endpos + 1 < len(rev_text) and rev_text[mention.endpos:mention.endpos + 2] == "'s":
             query_str1 = mention.name_str + "'s"
         es_search_result = self.__match_biz_es(rev_biz_city, mention.name_str, query_str1)
+        # print es_search_result
         candidates = YelpCandidateGen.__filter_es_candidates(es_search_result, mention)
+        # print candidates
 
         return candidates
 
@@ -77,7 +80,8 @@ class YelpCandidateGen:
         candidates = list()
         for hit in hits:
             biz_name = hit['_source']['name']
-            if YelpCandidateGen.__all_words_in(mention.name_str, biz_name):
+            # candidates.append((hit['_source']['business_id'], hit['_score']))
+            if ' ' in mention.name_str or YelpCandidateGen.__all_words_in(mention.name_str, biz_name):
                 candidates.append((hit['_source']['business_id'], hit['_score']))
         return candidates
 

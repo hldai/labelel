@@ -3,6 +3,8 @@
     NIL
 {% elif labelresult.cur_state == 2 %}
     Wrong Mention
+{% elif labelresult.cur_state == 5 %}
+    Unlinkable
 {% elif labelresult.cur_state == 3 %}
     {% if labelresult.is_wrong_span %}
     <i> Wrong Span </i> <br>

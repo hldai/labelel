@@ -136,6 +136,7 @@ def get_review_for_user(username, user_rev_idx):
 
     mention_dicts = received['mentions']
     mentions = [Mention.from_dict(mdict) for mdict in mention_dicts]
+    mentions.sort(key=lambda m: m.begpos)
 
     return rev_idx, res['_source'], mentions
 
@@ -260,6 +261,7 @@ def get_candidates_of_mentions(mentions, review_info, rev_biz_info, label_result
         else:
             # es_candidates = __gen_candidates_es(es, m, rev_city, review_info['text'])
             candidates = ycg.gen_candidates(m, rev_city, review_info['text'])
+            # print m.name_str, candidates
             tup = (m, False, [get_business(c[0]) for c in candidates])
             mention_candidates.append(tup)
     return mention_candidates
