@@ -1,0 +1,13 @@
+
+<div style="margin: 20px">
+    Logged in as:&nbsp; {{ username }} &nbsp;&nbsp; <a href="{% url 'yelp:logout' %}">Log out</a>
+    <br>
+    <hr>
+    <div>
+    Number of mentions to label: {{num_mentions}}
+    </div>
+    <br>
+    <hr>
+<a href="{% url 'yelp:review' username label_review_idx %}">Start Labeling</a>
+
+</div>

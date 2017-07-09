@@ -7,6 +7,8 @@ from django.contrib.auth import views as auth_views
 
 import reviewdata
 
+FIX_MODE = True
+
 
 def index(request):
     if not request.user.is_authenticated():
@@ -14,11 +16,18 @@ def index(request):
 
     context = dict()
     context['username'] = username = request.user.username
-    num_reviews = reviewdata.get_user_num_reviews(username)
-    context['num_reviews'] = num_reviews
-    context['num_mentions'] = reviewdata.get_user_num_labeled_mentions(username)
-    context['label_review_idx'] = 1 if num_reviews == 0 else num_reviews
-    return render(request, 'yelp/userlabelstat.html', context)
+
+    if FIX_MODE:
+        num_mentions = reviewdata.get_user_num_mentions(username)
+        context['num_mentions'] = num_mentions
+        context['label_review_idx'] = 1
+        return render(request, 'yelp/userlabelstatfix.html', context)
+    else:
+        num_reviews = reviewdata.get_user_num_reviews(username)
+        context['num_reviews'] = num_reviews
+        context['num_mentions'] = reviewdata.get_user_num_labeled_mentions(username)
+        context['label_review_idx'] = 1 if num_reviews == 0 else num_reviews
+        return render(request, 'yelp/userlabelstat.html', context)
 
 
 def show_review(request, username, user_rev_idx):
@@ -33,7 +42,13 @@ def show_review(request, username, user_rev_idx):
     context['username'] = request.user.username
 
     user_rev_idx = int(user_rev_idx)
-    user_rev_idx, review_info, mentions = reviewdata.get_review_for_user(username, user_rev_idx)
+    r = reviewdata.get_review_for_user(username, user_rev_idx)
+    if not r:
+        user_num_mentions = reviewdata.get_user_num_mentions(username)
+        context['user_num_mentions'] = user_num_mentions
+        return render(request, 'yelp/nomorereviews.html', context)
+
+    user_rev_idx, review_info, mentions = r
     print len(mentions)
     rev_biz = reviewdata.get_business(review_info['business_id'])
 

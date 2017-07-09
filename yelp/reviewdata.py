@@ -84,6 +84,11 @@ def get_user_num_reviews(username):
     return received['num_reviews']
 
 
+def get_user_num_mentions(username):
+    received = __query_review_dispatcher(username, -1)
+    return received['num_mentions']
+
+
 def highlight_mentions(rev_text, mentions, label_results):
     new_text = u''
     last_pos = 0
@@ -132,6 +137,9 @@ def get_review_for_user(username, user_rev_idx):
 
     rev_idx = received['review_idx']
     rev_id = received['review_id']
+    if rev_id == 'NULL':
+        return None
+
     res = es.get(index=index_name, doc_type=rev_doc_type, id=rev_id)
 
     mention_dicts = received['mentions']
